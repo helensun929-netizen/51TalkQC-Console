@@ -1,0 +1,123 @@
+# 部署步骤
+
+整体约 20 分钟，分三段：建数据库 → 发布网页 → 初始化数据。
+
+```mermaid
+flowchart LR
+  A[1 注册 Supabase<br/>新建项目] --> B[2 运行 setup.sql] --> C[3 设置登录方式] --> D[4 填 config.js]
+  D --> E[5 上传到 GitHub] --> F[6 开启 Pages] --> G[7 注册管理员] --> H[8 初始化数据]
+```
+
+---
+
+## 第一段：建数据库（Supabase）
+
+### 1. 新建项目
+1. 打开 https://supabase.com ，用 GitHub 账号登录。
+2. 点 **New project**：
+   - Name：`qc-workbench`
+   - Database Password：点 Generate 生成并自己保存好
+   - Region：选 **Northeast Asia (Tokyo)** 或 **Southeast Asia (Singapore)**，国内访问更快
+3. 等 1–2 分钟项目创建完成。
+
+### 2. 运行初始化脚本
+1. 左侧菜单 **SQL Editor** → **New query**。
+2. 打开仓库里的 `supabase/setup.sql`，全部复制粘贴进去，点 **Run**。
+3. 看到 `Success. No rows returned` 即完成。脚本可以重复运行，不会删数据。
+
+### 3. 设置登录方式
+左侧 **Authentication** → **Sign In / Providers**（旧版叫 Providers）：
+- **Email** 保持开启。
+- 内部使用建议关闭 **Confirm email**，同事注册后可以直接登录，不用去邮箱点链接。（保留开启也可以，只是多一步确认邮件。）
+
+**Authentication → URL Configuration**：
+- **Site URL** 填之后的网页地址，例如 `https://你的GitHub用户名.github.io/qc-workbench/`
+
+### 4. 拿到连接信息，填进 config.js
+左侧 **Project Settings → API**（或 **Data API**）：
+- 复制 **Project URL**
+- 复制 **anon public** key（不是 service_role）
+
+用记事本打开仓库里的 `config.js`，填进引号：
+
+```js
+window.QC_CONFIG = {
+  supabaseUrl: 'https://xxxxxxxx.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOi...'
+};
+```
+
+---
+
+## 第二段：发布网页（GitHub Pages）
+
+### 5. 新建仓库并上传文件
+1. GitHub 右上角 **+ → New repository**，名称 `qc-workbench`，选 **Public**，点 Create。
+2. 在新仓库页面点 **uploading an existing file**，把以下文件和文件夹拖进去：
+   `index.html`、`config.js`、`README.md`、`DEPLOY.md`、`supabase/` 文件夹
+3. 点 **Commit changes**。
+
+> 免费版 GitHub Pages 要求仓库公开。仓库里只有代码，没有业务数据，也不含质检标准内容。
+
+### 6. 开启 Pages
+仓库 **Settings → Pages**：
+- Source：**Deploy from a branch**
+- Branch：**main**，文件夹 **/ (root)**，点 Save
+
+1–2 分钟后页面顶部会显示网址：`https://你的用户名.github.io/qc-workbench/`
+
+---
+
+## 第三段：初始化数据
+
+### 7. 注册管理员
+打开网址 → **注册** → 填姓名、工作邮箱、密码。**第一个注册的账号自动成为管理员**，所以请你自己先注册。
+
+### 8. 按顺序完成初始化
+
+| 顺序 | 位置 | 操作 |
+|---|---|---|
+| ① | 课堂质检 → 标准库 → 体验课 → 上传新版 Excel | 上传《单词2.2体验课课程质量检验标准》，填说明，保存 |
+| ② | 课堂质检 → 标准库 → 正课 → 上传新版 Excel | 上传《单词2.2正课 评价标准细则》，填说明，保存 |
+| ③ | 导入 → 教练信息 | 上传教练信息表（如「薪资信息」导出表），确认列对应后导入 |
+| ④ | 导入 → 退费明细 | 上传退费明细，确认「退费时第几节课」那一列对应正确 |
+| ⑤ | 教练档案 → 标签设置 | 确认画像标签的下拉选项 |
+| ⑥ | 把网址发给同事注册 | 同事注册后为「待审核」 |
+| ⑦ | 导入 → 成员权限 | 给同事分配：管理员 / 质检专员 / 只读 |
+| ⑧ | 任务中心 → 派发设置 | 添加质检专员、设每日上限、确认规则，勾选「自动派发」并保存 |
+
+完成后，第二天起系统每天自动派发质检任务。
+
+---
+
+## 日常维护
+
+**更新网页**：拿到新版 `index.html` 后，在仓库里点该文件 → 铅笔旁的 **⋯ → Upload files** 覆盖上传 → Commit。`config.js` 不用动。
+
+**备份数据**：Supabase 后台 **Table Editor → docs → Export → CSV**，建议每月导出一次。
+
+**免费额度**：Supabase 免费版 500MB 数据库，足够本工作台使用多年。项目连续 7 天无人访问会被暂停，在后台点 Restore 即可恢复；正常每天使用不会触发。
+
+**忘记密码**：管理员可在 Supabase 后台 **Authentication → Users** 找到该用户，发送重置密码邮件或删除后让其重新注册（重新注册后需再次分配角色）。
+
+---
+
+## 常见问题
+
+| 现象 | 原因与处理 |
+|---|---|
+| 打开显示「还没有配置数据库」 | `config.js` 没填或填错，检查 URL 和 anon key |
+| 注册后一直显示「等待管理员开通」 | 正常，管理员在「导入 → 成员权限」分配角色后刷新 |
+| 保存时提示「只有查看权限」 | 当前账号是只读或待审核，请管理员调整角色 |
+| 上传 Excel 提示组件加载失败 | 网络拦截了 cdnjs，换网络或稍后重试 |
+| 别人的修改没有马上出现 | 实时同步未开启：重新运行一次 `setup.sql` 最后一段 |
+| 国内打开慢 | GitHub Pages 和 Supabase 都在境外；如需更稳定，可以后续迁到国内托管 |
+
+---
+
+## 从 claude.ai 版本迁移
+
+claude.ai 版本里的数据不会自动带过来：
+- 教练名单、退费明细：用原 Excel 在新版本里重新导入即可。
+- 质检标准：按第 8 步上传两份标准表。
+- 已有的质检记录、任务、工单：如需迁移，可以导出 CSV 后联系维护人处理。
