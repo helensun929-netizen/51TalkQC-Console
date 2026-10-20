@@ -1953,9 +1953,9 @@ function refundSection(a,canTag){
   if(!rf.all.length&&!rf.tag.mode&&!ed)return canTag?'<div><div class="sec-t" style="justify-content:space-between">退费 <button class="btn sm" id="rf-open">手动标记</button></div><div class="note">没有退费记录</div></div>':'';
   return '<div><div class="sec-t" style="justify-content:space-between">退费 · 近 '+RR.days+' 天'+(canTag&&!ed?' <button class="btn sm" id="rf-open">手动标记</button>':'')+'</div>'+
    '<div class="trs" style="margin-bottom:8px">'+(rf.high?'<span class="chip '+RCAT[rf.cat][2]+'">高退费 · '+RCAT[rf.cat][0]+'</span>':'<span class="chip c-ok">未达高退费</span>')+'<span class="tr-chip ele"><b>合计</b>'+rf.n+' 单</span>'+RCATS.map(k=>'<span class="tr-chip '+(rf.cnt[k]?(k==='other'?'ele':'req'):'ele')+'"><b>'+RCAT[k][1].replace(/退费$/,'')+'</b>'+rf.cnt[k]+'</span>').join('')+'</div>'+
-   '<p class="note" style="margin:0 0 8px">'+(rf.src==='manual'?'手动'+(rf.tag.mode==='on'?'标为高退费':'取消高退费')+(rf.tag.note?'：'+esc(rf.tag.note):'')+(rf.tag.by?' · '+esc(who(rf.tag.by)):'')+(rf.tag.at?' · '+fmtT(rf.tag.at):''):'系统判定：近 '+RR.days+' 天 ≥ '+RR.min+' 单为高退费')+'</p>'+
+   '<p class="note" style="margin:0 0 8px">'+(rf.src==='manual'?'手动'+(rf.tag.mode==='on'?'标为高退费':'取消高退费')+(rf.tag.note?'：'+esc(rf.tag.note):'')+(rf.tag.by?' · '+esc(who(rf.tag.by)):'')+(rf.tag.at?' · '+fmtT(rf.tag.at):''):'系统判定：近 '+RR.days+' 天 ≥ '+RR.min+' 单为高退费'+(RR.roles&&RR.roles!=='both'?'（只算'+RROLE[RR.roles]+'教练的退费）':''))+'</p>'+
    (ed?'<div class="panel" style="padding:12px 14px;display:flex;flex-direction:column;gap:10px"><div class="form-grid">'+fld('标记','<select class="inp" id="rf-mode"><option value="">按系统判定</option><option value="on"'+(rfEdit.mode==='on'?' selected':'')+'>标为高退费</option><option value="off"'+(rfEdit.mode==='off'?' selected':'')+'>不算高退费</option></select>')+fld('退费分类','<select class="inp" id="rf-cat"><option value="">按退费记录</option>'+RCATS.map(k=>'<option value="'+k+'"'+(rfEdit.cat===k?' selected':'')+'>'+RCAT[k][0]+' · '+RCAT[k][1]+'</option>').join('')+'</select>')+'</div>'+fld('原因','<input class="inp" id="rf-note" value="'+esc(rfEdit.note||'')+'" placeholder="如：退费数据未包含线下退费单">')+'<div class="actions"><button class="btn primary" id="rf-save">保存</button><button class="btn" id="rf-x">取消</button></div></div>':'')+
-   (rf.all.length?'<div class="tbl-wrap"><table><thead><tr><th>日期</th><th>第几节</th><th>分类</th><th>学员</th><th>原因</th></tr></thead><tbody>'+rf.all.slice(0,8).map(x=>'<tr style="opacity:'+(rf.win.includes(x)?1:.5)+'"><td class="mono" style="font-size:12px;white-space:nowrap">'+esc(x.date)+'</td><td class="mono">'+(x.lessonNo==null?'—':x.lessonNo)+'</td><td><span class="chip plain '+RCAT[x.cat][2]+'">'+RCAT[x.cat][0]+'</span></td><td class="mono" style="font-size:12px">'+esc(x.student||'')+'</td><td class="note">'+esc(x.reason||'')+'</td></tr>').join('')+'</tbody></table></div>'+(rf.all.length>8?'<p class="note" style="margin:6px 0 0">共 '+rf.all.length+' 条，灰色为窗口外</p>':''):'')+'</div>';
+   (rf.all.length?'<div class="tbl-wrap"><table><thead><tr><th>日期</th><th>角色</th><th>第几节</th><th>分类</th><th>学员</th><th>原因</th></tr></thead><tbody>'+rf.all.slice(0,8).map(x=>'<tr style="opacity:'+(rf.win.includes(x)?1:.5)+'"><td class="mono" style="font-size:12px;white-space:nowrap">'+esc(x.date)+'</td><td>'+esc(RROLE[x.role]||'—')+'</td><td class="mono">'+(x.lessonNo==null?'—':x.lessonNo)+'</td><td><span class="chip plain '+RCAT[x.cat][2]+'">'+RCAT[x.cat][0]+'</span></td><td class="mono" style="font-size:12px">'+esc(x.student||'')+'</td><td class="note">'+esc(x.reason||'')+'</td></tr>').join('')+'</tbody></table></div>'+(rf.all.length>8?'<p class="note" style="margin:6px 0 0">共 '+rf.all.length+' 条，灰色为不计入（窗口外或角色不在统计范围）</p>':''):'')+'</div>';
 }
 function drawCoach(key){
   const a=coachAgg().find(x=>x.key===key);if(!a)return null;const ro=a.ro,T=TAGS();
@@ -2231,11 +2231,13 @@ function bindNewTask(){
 /* =====================================================================
    REFUNDS — import detail rows, classify by lesson number, flag 高退费
    ===================================================================== */
-const RFF=[['coachId','教练 ID',true,['业务系统编号','教练id','老师id','授课老师id','教师id','工号','教练编号','老师编号']],['coachName','教练姓名',false,['教练姓名','老师姓名','授课老师','授课教练','教练','老师']],['date','退费日期',true,['退费日期','退费时间','退费申请时间','申请退费时间','退款日期','退款时间','申请时间','日期']],['lessonNo','退费时第几节课',true,['退费节次','第几节课退费','退费时已上课节数','退费时已上节数','已上课节数','已上课次数','已上节数','已耗课时','已消耗课时','上课节数','课节','节次']],['order','退费单号',false,['退费单号','退款单号','订单号','订单编号','单号']],['student','学员',false,['学员id','学生id','学员','学生']],['reason','退费原因',false,['退费原因','退款原因','原因']]];
-const RCAT={early3:['前 3 节','第 1–3 节退费','c-bad'],early6:['前 6 节','第 4–6 节退费','c-warn'],other:['其他','第 7 节及以后 / 未填节次','c-info']};
+const RFF=[['trialId','体验课教练 ID',false,['体验课教练id','体验教练id','体验课老师id','体验老师id','体验课教练编号','体验课老师编号']],['trialName','体验课教练姓名',false,['体验课教练姓名','体验教练姓名','体验课老师姓名','体验课教练','体验课老师','体验教练','体验老师']],['formalId','正课教练 ID',false,['正课教练id','正课老师id','正课教练编号','正课老师编号','主讲老师id','业务系统编号','教练id','老师id','授课老师id','教师id','工号','教练编号','老师编号']],['formalName','正课教练姓名',false,['正课教练姓名','正课老师姓名','正课教练','正课老师','教练姓名','老师姓名','授课老师','授课教练']],['date','退费日期',true,['退费日期','退费时间','退费申请时间','申请退费时间','退款日期','退款时间','申请时间','日期']],['lessonNo','退费时第几节课',true,['退费前第几次课','退费前第几节课','退费时第几次课','退费时第几节课','第几次课退费','第几节课退费','退费节次','退费时已上课节数','退费时已上节数','已上课节数','已上课次数','已上节数','已耗课时','已消耗课时','上课节数','第几次课','第几节课','课节','节次']],['first3','是否前三节内退费',false,['是否前三节课内退费','是否前三节内退费','是否前3节课内退费','是否前3节内退费','前三节课内退费','前三节退费']],['order','退费单号',false,['退费单号','退款单号','退费订单id','订单id','订单号','订单编号','单号']],['student','学员',false,['学员id','学生id','学员','学生']],['reason','退费原因',false,['退费原因','退款原因','原因']]];
+const RROLE={trial:'体验课',formal:'正课',both:'体验+正课'};
+const rRoleOk=(x,RR)=>!RR.roles||RR.roles==='both'||!x.role||x.role==='both'||x.role===RR.roles;
+const RCAT={early3:['前 3 节','第 0–3 节退费','c-bad'],early6:['前 6 节','第 4–6 节退费','c-warn'],other:['其他','第 7 节及以后 / 未填节次','c-info']};
 const RCATS=['early3','early6','other'];
-const catOf=n=>!(n>0)?'other':n<=3?'early3':n<=6?'early6':'other';
-const RRULE0={days:90,min:3};
+const catOf=n=>n==null||isNaN(n)||n<0?'other':n<=3?'early3':n<=6?'early6':'other';
+const RRULE0={days:90,min:3,roles:'both'};
 const RRULE=()=>Object.assign({},RRULE0,(Store.data.config.refundRule||{}).data||{});
 let REFUND_BY=new Map(),REFUND_N=0,REFUND_META=null;
 function rebuildRefunds(){
@@ -2244,7 +2246,7 @@ function rebuildRefunds(){
   m.forEach(a=>a.sort((x,y)=>x.date<y.date?1:-1));REFUND_BY=m;REFUND_N=n;
 }
 function refundOf(coachId){
-  const RR=RRULE(),from=addDays(today(),-(+RR.days-1)),all=REFUND_BY.get(coachId)||[],win=all.filter(x=>(x.date||'')>=from),cnt={early3:0,early6:0,other:0};
+  const RR=RRULE(),from=addDays(today(),-(+RR.days-1)),all=REFUND_BY.get(coachId)||[],win=all.filter(x=>(x.date||'')>=from&&rRoleOk(x,RR)),cnt={early3:0,early6:0,other:0};
   win.forEach(x=>cnt[x.cat]=(cnt[x.cat]||0)+1);
   let cat=win.length?RCATS.reduce((a,k)=>cnt[k]>cnt[a]?k:a,'early3'):'';
   const tg=((ctagOf(coachId)||{}).refund)||{};let high=win.length>=+RR.min,src='auto';
@@ -2257,18 +2259,22 @@ let RIMP=null;
 function rimpSetSheet(name){RIMP.sheet=name;RIMP.rows=aoa(RIMP.X,RIMP.wb.Sheets[name]);rimpSetHeader(guessHeader(RIMP.rows,RFF))}
 function rimpSetHeader(h){RIMP.headerRow=h;RIMP.hdr=(RIMP.rows[h]||[]).map(cellStr);RIMP.map=guessMap(RIMP.rows[h]||[],RFF)}
 function rimpParse(){
-  const g=(row,k)=>RIMP.map[k]==null?'':row[RIMP.map[k]];const out=new Map(),invalid=[];let dup=0,noLesson=0;
+  const g=(row,k)=>RIMP.map[k]==null?'':row[RIMP.map[k]];const out=new Map(),invalid=[];let dup=0,noLesson=0,rows=0,both=0,roleN={trial:0,formal:0};
+  const cnNum={'零':0,'一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10};
   for(let i=RIMP.headerRow+1;i<RIMP.rows.length;i++){const row=RIMP.rows[i];if(!row.some(v=>cellStr(v)))continue;
-    const id=cellStr(g(row,'coachId')),date=normDate(g(row,'date'));if(!id||!isDate(date)){invalid.push(i+1);continue}
-    const ls=cellStr(g(row,'lessonNo')).match(/\d+/),lessonNo=ls?+ls[0]:null;if(lessonNo==null)noLesson++;
-    const order=cellStr(g(row,'order')),student=cellStr(g(row,'student'));
-    const it={k:order?'o:'+order:[id,student,date,lessonNo==null?'':lessonNo].join('|'),coachId:id,coachName:cellStr(g(row,'coachName'))||((ROSTER.get(id)||{}).name||''),date,lessonNo,cat:catOf(lessonNo),order,student,reason:cellStr(g(row,'reason')).slice(0,120)};
-    if(out.has(it.k))dup++;out.set(it.k,it)}
+    const tId=cellStr(g(row,'trialId')),fId=cellStr(g(row,'formalId')),date=normDate(g(row,'date'));if((!tId&&!fId)||!isDate(date)){invalid.push(i+1);continue}
+    rows++;const raw=cellStr(g(row,'lessonNo'));let ls=raw.match(/\d+/),lessonNo=ls?+ls[0]:null;if(lessonNo==null){const c=raw.match(/[零一二两三四五六七八九十]/);if(c)lessonNo=cnNum[c[0]]}
+    let cat=catOf(lessonNo);if(lessonNo==null){const f3=cellStr(g(row,'first3'));if(/^(是|y|yes|true|1)$/i.test(f3))cat='early3';noLesson++}
+    const order=cellStr(g(row,'order')),student=cellStr(g(row,'student')),reason=cellStr(g(row,'reason')).slice(0,120);
+    const roles=[];if(tId&&fId&&tId===fId){roles.push(['both',tId,cellStr(g(row,'trialName'))||cellStr(g(row,'formalName'))]);both++}else{if(tId)roles.push(['trial',tId,cellStr(g(row,'trialName'))]);if(fId)roles.push(['formal',fId,cellStr(g(row,'formalName'))])}
+    roles.forEach(([role,id,nm])=>{if(role==='both'){roleN.trial++;roleN.formal++}else roleN[role]++;
+      const it={k:(order?'o:'+order:[id,student,date,lessonNo==null?'':lessonNo].join('|'))+'|'+role,role,coachId:id,coachName:nm||((ROSTER.get(id)||{}).name||''),date,lessonNo,cat,order,student,reason};
+      if(out.has(it.k))dup++;out.set(it.k,it)})}
   const merged=new Map();if(!RIMP.replace)REFUND_BY.forEach(a=>a.forEach(x=>merged.set(x.k,x)));
   let added=0,updated=0,same=0;out.forEach((x,k)=>{const o=merged.get(k);if(!o)added++;else if(JSON.stringify(o)!==JSON.stringify(x))updated++;else same++;merged.set(k,x)});
   const unknown=new Set();out.forEach(x=>{if(ROSTER.size&&!ROSTER.has(x.coachId))unknown.add(x.coachId)});
   const cnt={early3:0,early6:0,other:0};out.forEach(x=>cnt[x.cat]++);
-  return {out,merged,invalid,dup,noLesson,added,updated,same,unknown,cnt};
+  return {out,merged,invalid,dup,noLesson,added,updated,same,unknown,cnt,rows,both,roleN};
 }
 async function writeRefunds(merged,meta){
   const list=[...merged.values()].sort((a,b)=>a.date<b.date?1:-1),enc=new TextEncoder(),chunks=[];let cur=[],size=0;
@@ -2281,40 +2287,40 @@ async function writeRefunds(merged,meta){
 function renderRefundImport(box){
   if(RIMP&&RIMP.stage)return renderRimpFlow(box);
   const RR=RRULE(),admin=IS_ADMIN&&!Store.readOnly,from=addDays(today(),-(+RR.days-1));
-  let win=0;const cnt={early3:0,early6:0,other:0};REFUND_BY.forEach(a=>a.forEach(x=>{if(x.date>=from){win++;cnt[x.cat]++}}));
+  let win=0;const cnt={early3:0,early6:0,other:0};REFUND_BY.forEach(a=>a.forEach(x=>{if(x.date>=from&&rRoleOk(x,RR)){win++;cnt[x.cat]++}}));
   const highs=[...REFUND_BY.keys()].map(id=>refundOf(id)).filter(r=>r.high),hc={early3:0,early6:0,other:0};highs.forEach(r=>hc[r.cat]++);
   const hist=Store.all('imports').filter(h=>h.kind==='refund').sort((a,b)=>b.at-a.at).slice(0,10);
   box.innerHTML='<div class="stats"><div class="stat"><div class="num">'+REFUND_N+'</div><div class="lab">退费记录总数</div></div><div class="stat"><div class="num">'+win+'</div><div class="lab">近 '+RR.days+' 天退费</div></div><div class="stat"><div class="num" style="color:var(--bad)">'+highs.length+'</div><div class="lab">高退费教练</div></div><div class="stat"><div class="num" style="font-size:16px;line-height:1.4">'+(REFUND_META?fmtT(REFUND_META.updatedAt):'—')+'</div><div class="lab">最近导入</div></div></div>'+
   '<div class="grid-2"><div class="panel"><div class="p-label">近 '+RR.days+' 天退费 · 按节次</div><div class="bars">'+RCATS.map(k=>'<div class="bar-row" style="grid-template-columns:150px minmax(0,1fr) 44px"><span>'+RCAT[k][1]+'</span><div class="bar-track"><span style="width:'+(win?cnt[k]/win*100:0)+'%;background:'+(k==='early3'?'var(--bad)':k==='early6'?'var(--warn)':'var(--info)')+'"></span></div><span class="v">'+cnt[k]+'</span></div>').join('')+'</div></div>'+
-  '<div class="panel"><div class="p-label">高退费判定</div><div class="form-row" style="font-size:13px;gap:8px">近 <input class="inp" type="number" min="1" id="rr-days" value="'+RR.days+'" style="width:72px"'+(admin?'':' disabled')+'> 天退费 ≥ <input class="inp" type="number" min="1" id="rr-min" value="'+RR.min+'" style="width:64px"'+(admin?'':' disabled')+'> 单'+(admin?' <button class="btn sm" id="rr-save">保存</button>':'')+'</div><p class="note" style="margin:10px 0 0">按教练在窗口内最多的一类归为「前 3 节 / 前 6 节 / 其他」，数量相同时取更早的节次。当前：前 3 节 '+hc.early3+' 人 · 前 6 节 '+hc.early6+' 人 · 其他 '+hc.other+' 人。高退费教练自动标为高风险，进入每日质检派发。个别教练可在教练档案里手动标记或取消。</p></div></div>'+
+  '<div class="panel"><div class="p-label">高退费判定</div><div class="form-row" style="font-size:13px;gap:8px">近 <input class="inp" type="number" min="1" id="rr-days" value="'+RR.days+'" style="width:72px"'+(admin?'':' disabled')+'> 天退费 ≥ <input class="inp" type="number" min="1" id="rr-min" value="'+RR.min+'" style="width:64px"'+(admin?'':' disabled')+'> 单 · 计入 <select class="inp" id="rr-roles" style="width:auto"'+(admin?'':' disabled')+'>'+[['both','体验课和正课教练'],['trial','只算体验课教练'],['formal','只算正课教练']].map(([v,t])=>'<option value="'+v+'"'+(RR.roles===v?' selected':'')+'>'+t+'</option>').join('')+'</select>'+(admin?' <button class="btn sm" id="rr-save">保存</button>':'')+'</div><p class="note" style="margin:10px 0 0">按教练在窗口内最多的一类归为「前 3 节 / 前 6 节 / 其他」，数量相同时取更早的节次。当前：前 3 节 '+hc.early3+' 人 · 前 6 节 '+hc.early6+' 人 · 其他 '+hc.other+' 人。高退费教练自动标为高风险，进入每日质检派发。个别教练可在教练档案里手动标记或取消。</p></div></div>'+
   '<div class="panel"><div class="p-label">导入退费明细 <button class="btn sm" id="rf-tpl">下载导入模板</button></div>'+
-  (admin?'<label class="drop" for="rf-file" style="cursor:pointer"><span class="big">选择退费明细 Excel 或 CSV</span><span>每笔退费一行。需要教练 ID、退费日期、退费时第几节课；有退费单号时用单号去重，没有时按教练 + 学员 + 日期 + 节次去重。</span><span class="btn primary">选择文件</span></label><input type="file" id="rf-file" accept=".xlsx,.xls,.csv" hidden><p class="note" id="rf-msg" style="margin:10px 0 0"></p>':'<div class="banner info"><div>退费明细由管理员导入。</div></div>')+'</div>'+
+  (admin?'<label class="drop" for="rf-file" style="cursor:pointer"><span class="big">选择退费明细 Excel 或 CSV</span><span>每笔退费一行。需要体验课教练 ID 和 / 或正课教练 ID、退费日期、退费时第几节课。同一笔退费有两位教练时分别计入两人；有订单号时用订单号去重。</span><span class="btn primary">选择文件</span></label><input type="file" id="rf-file" accept=".xlsx,.xls,.csv" hidden><p class="note" id="rf-msg" style="margin:10px 0 0"></p>':'<div class="banner info"><div>退费明细由管理员导入。</div></div>')+'</div>'+
   '<div class="panel"><div class="p-label">导入记录</div><div class="tbl-wrap"><table><thead><tr><th>时间</th><th>文件</th><th>结果</th><th>操作人</th></tr></thead><tbody>'+(hist.length?hist.map(h=>'<tr><td class="mono" style="font-size:12px;white-space:nowrap">'+fmtT(h.at)+'</td><td style="overflow-wrap:anywhere">'+esc(h.file)+'</td><td style="font-size:12px;white-space:nowrap"><span style="color:var(--ok)">新增 '+h.added+'</span> · 更新 '+h.updated+' · 不变 '+h.same+(h.replace?' · 全量替换':'')+(h.invalid?' · <span style="color:var(--bad)">跳过 '+h.invalid+'</span>':'')+'</td><td>'+esc(who(h.by))+'</td></tr>').join(''):'<tr><td colspan="4" class="note" style="text-align:center;padding:18px">还没有导入过</td></tr>')+'</tbody></table></div></div>';
-  $('#rf-tpl').onclick=()=>saveFile('退费明细导入模板.csv','﻿退费单号,业务系统编号,教练姓名,学员ID,退费日期,退费时第几节课,退费原因\nRF0001,6500001,示例教练,S10001,2026-10-01,2,孩子不适应老师风格\n');
-  const rs=$('#rr-save');if(rs)rs.onclick=async()=>{const d={days:Math.max(1,+$('#rr-days').value||90),min:Math.max(1,+$('#rr-min').value||3)};if(await safe(()=>Store.set('config','refundRule',{data:d,savedAt:Date.now(),by:meId()})))toast('判定规则已保存')};
+  $('#rf-tpl').onclick=()=>saveFile('退费明细导入模板.csv','﻿订单id,学员id,体验课教练ID,体验课教练姓名,正课教练ID,正课教练姓名,退费时间,退费前第几次课,是否前三节课内退费,退费原因\nRF0001,S10001,6500001,示例体验教练,6500002,示例正课教练,2026-10-01,2,是,孩子不适应老师风格\n');
+  const rs=$('#rr-save');if(rs)rs.onclick=async()=>{const d={days:Math.max(1,+$('#rr-days').value||90),min:Math.max(1,+$('#rr-min').value||3),roles:$('#rr-roles').value||'both'};if(await safe(()=>Store.set('config','refundRule',{data:d,savedAt:Date.now(),by:meId()})))toast('判定规则已保存')};
   const f=$('#rf-file');if(f)f.onchange=async()=>{const file=f.files[0];if(!file)return;$('#rf-msg').textContent='正在读取 '+file.name+' …';
     try{const wb=await readBook(file);RIMP={file:file.name,wb,X:window.XLSX,replace:false,stage:'map'};rimpSetSheet(wb.SheetNames[0]);renderImport()}
     catch(e){$('#rf-msg').textContent='读取失败：'+(e.message||'文件格式不支持')+'。请另存为 .xlsx 后重试';f.value=''}};
 }
 function renderRimpFlow(box){
   const P=rimpParse(),opts=i=>'<option value="">（不导入）</option>'+RIMP.hdr.map((h,ci)=>h?'<option value="'+ci+'"'+(i===ci?' selected':'')+'>'+esc(h)+'</option>':'').join('');
-  const miss=RFF.filter(f=>f[2]&&RIMP.map[f[0]]==null).map(f=>f[1]),prev=[...P.out.values()].slice(0,8);
+  const miss=RFF.filter(f=>f[2]&&RIMP.map[f[0]]==null).map(f=>f[1]).concat(RIMP.map.trialId==null&&RIMP.map.formalId==null?['体验课教练 ID 或正课教练 ID（至少一个）']:[]),prev=[...P.out.values()].slice(0,8);
   box.innerHTML='<div class="panel"><div class="p-label">'+esc(RIMP.file)+' <button class="btn sm" id="rf-cancel">取消导入</button></div><div class="form-grid">'+(RIMP.wb.SheetNames.length>1?fld('工作表','<select class="inp" id="rf-sheet">'+RIMP.wb.SheetNames.map(n=>'<option'+(n===RIMP.sheet?' selected':'')+'>'+esc(n)+'</option>').join('')+'</select>'):'')+fld('表头在第几行',inp('rf-hdr',String(RIMP.headerRow+1),'number','',' min="1"'))+'</div></div>'+
-  '<div class="panel"><div class="p-label">列对应 <b>已自动识别，可手动调整</b></div><div class="tbl-wrap"><table><thead><tr><th>系统字段</th><th>你的表头</th><th>示例</th></tr></thead><tbody>'+RFF.map(([k,t,req])=>{const ci=RIMP.map[k];return '<tr><td><b>'+t+'</b> '+(req?'<span class="chip c-bad plain" style="font-size:10px;padding:1px 6px">必填</span>':'')+'</td><td><select class="inp" data-rmap="'+k+'">'+opts(ci)+'</select></td><td class="note">'+esc(ci==null?'':cellStr((RIMP.rows[RIMP.headerRow+1]||[])[ci]))+'</td></tr>'}).join('')+'</tbody></table></div><p class="note" style="margin:10px 0 0">金额、手机号等其他列不会导入。</p></div>'+
-  '<div class="panel"><div class="p-label">预览</div><div class="vstats"><div class="vstat"><div class="num">'+P.out.size+'</div><div class="lab">有效退费</div></div><div class="vstat" style="border-color:rgba(var(--bad-rgb),.4)"><div class="num" style="color:var(--bad)">'+P.cnt.early3+'</div><div class="lab">第 1–3 节</div></div><div class="vstat" style="border-color:rgba(var(--warn-rgb),.4)"><div class="num" style="color:var(--warn)">'+P.cnt.early6+'</div><div class="lab">第 4–6 节</div></div><div class="vstat"><div class="num">'+P.cnt.other+'</div><div class="lab">第 7 节及以后</div></div></div>'+
-   '<p class="note" style="margin:10px 0 0">新增 '+P.added+' · 更新 '+P.updated+' · 不变 '+P.same+'</p>'+
-   (P.invalid.length||P.dup||P.noLesson||P.unknown.size?'<div class="banner warn" style="margin-top:12px"><div>'+(P.invalid.length?'有 '+P.invalid.length+' 行缺教练 ID 或日期，将跳过（第 '+P.invalid.slice(0,8).join('、')+(P.invalid.length>8?' 等':'')+' 行）。':'')+(P.dup?'文件内有 '+P.dup+' 条重复，以靠后的为准。':'')+(P.noLesson?P.noLesson+' 条没有节次，归入「其他」。':'')+(P.unknown.size?P.unknown.size+' 个教练 ID 不在教练名单里。':'')+'</div></div>':'')+
+  '<div class="panel"><div class="p-label">列对应 <b>已自动识别，可手动调整</b></div><div class="tbl-wrap"><table><thead><tr><th>系统字段</th><th>你的表头</th><th>示例</th></tr></thead><tbody>'+RFF.map(([k,t,req])=>{const ci=RIMP.map[k];return '<tr><td><b>'+t+'</b> '+(req?'<span class="chip c-bad plain" style="font-size:10px;padding:1px 6px">必填</span>':k==='trialId'||k==='formalId'?'<span class="chip c-warn plain" style="font-size:10px;padding:1px 6px">二选一</span>':'')+'</td><td><select class="inp" data-rmap="'+k+'">'+opts(ci)+'</select></td><td class="note">'+esc(ci==null?'':cellStr((RIMP.rows[RIMP.headerRow+1]||[])[ci]))+'</td></tr>'}).join('')+'</tbody></table></div><p class="note" style="margin:10px 0 0">体验课教练和正课教练分别对应各自的列：同一笔退费会计入两位教练（各记一条，标明角色）；两列是同一人时只记一条。「是否前三节内退费」在节次为空时用来补判。金额、手机号等其他列不会导入。</p></div>'+
+  '<div class="panel"><div class="p-label">预览</div><div class="vstats"><div class="vstat"><div class="num">'+P.rows+'</div><div class="lab">有效退费单 · 计入体验 '+P.roleN.trial+' / 正课 '+P.roleN.formal+'</div></div><div class="vstat" style="border-color:rgba(var(--bad-rgb),.4)"><div class="num" style="color:var(--bad)">'+P.cnt.early3+'</div><div class="lab">第 0–3 节</div></div><div class="vstat" style="border-color:rgba(var(--warn-rgb),.4)"><div class="num" style="color:var(--warn)">'+P.cnt.early6+'</div><div class="lab">第 4–6 节</div></div><div class="vstat"><div class="num">'+P.cnt.other+'</div><div class="lab">第 7 节及以后</div></div></div>'+
+   '<p class="note" style="margin:10px 0 0">按教练计共 '+P.out.size+' 条（新增 '+P.added+' · 更新 '+P.updated+' · 不变 '+P.same+'）'+(P.both?' · '+P.both+' 单体验课和正课是同一位教练':'')+'。第 0 节表示还没上正课就退费，算在前 3 节内。</p>'+
+   (P.invalid.length||P.dup||P.noLesson||P.unknown.size?'<div class="banner warn" style="margin-top:12px"><div>'+(P.invalid.length?'有 '+P.invalid.length+' 行两类教练 ID 都没有或缺日期，将跳过（第 '+P.invalid.slice(0,8).join('、')+(P.invalid.length>8?' 等':'')+' 行）。':'')+(P.dup?'文件内有 '+P.dup+' 条重复，以靠后的为准。':'')+(P.noLesson?P.noLesson+' 单没有节次，有「是否前三节内退费」=是的归入前 3 节，其余归入「其他」。':'')+(P.unknown.size?P.unknown.size+' 个教练 ID 不在教练名单里。':'')+'</div></div>':'')+
    '<label class="banner info" style="margin-top:12px;cursor:pointer"><input type="checkbox" id="rf-replace"'+(RIMP.replace?' checked':'')+'> <span>用这份文件替换全部已有退费记录<br><span class="note">文件是完整导出时才勾选；不勾选则合并，已有记录保留</span></span></label>'+
-   (prev.length?'<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>日期</th><th>教练</th><th>第几节</th><th>分类</th><th>原因</th></tr></thead><tbody>'+prev.map(x=>'<tr><td class="mono" style="font-size:12px">'+esc(x.date)+'</td><td>'+esc(x.coachName)+' <span class="sub mono" style="display:inline">'+esc(x.coachId)+'</span></td><td class="mono">'+(x.lessonNo==null?'—':x.lessonNo)+'</td><td><span class="chip plain '+RCAT[x.cat][2]+'">'+RCAT[x.cat][0]+'</span></td><td class="note">'+esc(x.reason)+'</td></tr>').join('')+'</tbody></table></div>':'')+
+   (prev.length?'<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>日期</th><th>教练</th><th>角色</th><th>第几节</th><th>分类</th><th>原因</th></tr></thead><tbody>'+prev.map(x=>'<tr><td class="mono" style="font-size:12px">'+esc(x.date)+'</td><td>'+esc(x.coachName)+' <span class="sub mono" style="display:inline">'+esc(x.coachId)+'</span></td><td><span class="chip plain">'+esc(RROLE[x.role]||'—')+'</span></td><td class="mono">'+(x.lessonNo==null?'—':x.lessonNo)+'</td><td><span class="chip plain '+RCAT[x.cat][2]+'">'+RCAT[x.cat][0]+'</span></td><td class="note">'+esc(x.reason)+'</td></tr>').join('')+'</tbody></table></div>':'')+
    '<div class="row-actions" style="margin-top:14px">'+(miss.length?'<span class="errs">请对应：'+miss.join('、')+'</span>':'<span class="note">导入后共 '+P.merged.size+' 条退费记录</span>')+'<button class="btn primary" id="rf-go"'+(miss.length||!P.out.size?' disabled':'')+'>确认导入</button></div></div>';
-  $('#rf-cancel').onclick=()=>{RIMP=null;renderImport()};
-  const sh=$('#rf-sheet');if(sh)sh.onchange=()=>{rimpSetSheet(sh.value);renderImport()};
-  const ih=$('#rf-hdr');ih.oninput=()=>{clearTimeout(ih._t);ih._t=setTimeout(()=>{rimpSetHeader(Math.min(Math.max(1,parseInt(ih.value)||1)-1,RIMP.rows.length-1));ih.blur();renderImport()},600)};
-  box.querySelectorAll('[data-rmap]').forEach(s=>s.onchange=()=>{const k=s.dataset.rmap,v=s.value===''?null:+s.value;Object.keys(RIMP.map).forEach(x=>{if(RIMP.map[x]===v)delete RIMP.map[x]});if(v==null)delete RIMP.map[k];else RIMP.map[k]=v;renderImport()});
-  $('#rf-replace').onchange=e=>{RIMP.replace=e.target.checked;renderImport()};
+  $('#rf-cancel').onclick=()=>{RIMP=null;renderImport(true)};
+  const sh=$('#rf-sheet');if(sh)sh.onchange=()=>{rimpSetSheet(sh.value);renderImport(true)};
+  const ih=$('#rf-hdr');ih.oninput=()=>{clearTimeout(ih._t);ih._t=setTimeout(()=>{rimpSetHeader(Math.min(Math.max(1,parseInt(ih.value)||1)-1,RIMP.rows.length-1));ih.blur();renderImport(true)},600)};
+  box.querySelectorAll('[data-rmap]').forEach(s=>s.onchange=()=>{const k=s.dataset.rmap,v=s.value===''?null:+s.value;Object.keys(RIMP.map).forEach(x=>{if(RIMP.map[x]===v)delete RIMP.map[x]});if(v==null)delete RIMP.map[k];else RIMP.map[k]=v;renderImport(true)});
+  $('#rf-replace').onchange=e=>{RIMP.replace=e.target.checked;renderImport(true)};
   $('#rf-go').onclick=async()=>{const b=$('#rf-go');b.disabled=true;b.textContent='正在导入…';const Q=rimpParse(),now=Date.now();
     const ok=await safe(async()=>{await writeRefunds(Q.merged,{updatedAt:now,by:meId(),file:RIMP.file});await Store.set('imports',uid('IM'),{kind:'refund',at:now,by:meId(),file:RIMP.file,rows:Q.out.size,added:Q.added,updated:Q.updated,same:Q.same,invalid:Q.invalid.length,replace:RIMP.replace})});
-    if(ok){toast('退费明细已导入：新增 '+Q.added+'，更新 '+Q.updated);RIMP=null;renderImport()}else{b.disabled=false;b.textContent='确认导入'}};
+    if(ok){toast('退费明细已导入：新增 '+Q.added+'，更新 '+Q.updated);RIMP=null;renderImport(true)}else{b.disabled=false;b.textContent='确认导入'}};
 }
 
 /* =====================================================================
@@ -2373,7 +2379,7 @@ async function writeRoster(merged,meta){
   for(const k of Object.keys(Store.data.roster))if(k!=='meta'&&!ids.includes(k))await Store.del('roster',k);
   await Store.set('roster','meta',Object.assign({count:list.length,active:list.filter(isActive).length,chunks:ids.length},meta));
 }
-function renderImport(){
+function renderImport(force){
   const el=$('#v-import');
   if(!el.dataset.built){
     el.innerHTML='<div class="v-head"><div><div class="eyebrow"><span class="dot"></span>08 · Import</div><h1>导入</h1><p>教练名单是录入质检、看板分组、教练档案的基础数据，由管理员导入和更新。投诉、退费、回访等外部反馈可以在这里手动新建工单。</p></div></div><div class="tabs" id="imp-tabs"></div><div id="imp-body" style="display:flex;flex-direction:column;gap:18px"></div>';
@@ -2385,9 +2391,9 @@ function renderImport(){
   if(impTab==='members'){if(!box.dataset.mem){box.dataset.mem='1';renderMembers(box)}return}
   box.dataset.mem='';
   if(impTab==='case'){if(!el.dataset.nc){renderNewCase(box);el.dataset.nc='1'}return}
-  if(impTab==='refund'){if(!Store.ready()){box.innerHTML=loadingHtml;return}const ae=document.activeElement;if(RIMP&&RIMP.stage&&ae&&box.contains(ae)&&/INPUT|SELECT/.test(ae.tagName))return;return renderRefundImport(box)}
+  if(impTab==='refund'){if(!Store.ready()){box.innerHTML=loadingHtml;return}const ae=document.activeElement;if(!force&&RIMP&&RIMP.stage&&ae&&box.contains(ae)&&/INPUT|SELECT/.test(ae.tagName))return;return renderRefundImport(box)}
   if(!Store.ready()){box.innerHTML=loadingHtml;return}
-  if(IMP&&IMP.stage){const ae=document.activeElement;if(ae&&box.contains(ae)&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName)&&box.dataset.flow)return;box.dataset.flow='1';return renderImpFlow(box)}
+  if(IMP&&IMP.stage){const ae=document.activeElement;if(!force&&ae&&box.contains(ae)&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName)&&box.dataset.flow)return;box.dataset.flow='1';return renderImpFlow(box)}
   box.dataset.flow='';
   const list=[...ROSTER.values()],act=list.filter(isActive);
   const by=k=>{const m={};act.forEach(c=>{const v=c[k]||'未填';m[v]=(m[v]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])};
@@ -2418,12 +2424,12 @@ function renderImpFlow(box){
    '<label class="banner info" style="margin-top:12px;cursor:pointer"><input type="checkbox" id="imp-retire"'+(IMP.retire?' checked':'')+'> <span>名单里在职、但这份文件里没有的教练标为「离职」'+(IMP.retire?'（将标记 '+P.retired+' 人）':'')+'<br><span class="note">只有这份文件是完整的在职名单时才勾选</span></span></label>'+
    (prev.length?'<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>教练 ID</th><th>姓名</th><th>标签</th><th>等级</th><th>团队 · 基地 · 组</th><th>入职</th><th>状态</th><th>其他</th></tr></thead><tbody>'+prev.map(c=>'<tr><td class="mono">'+esc(c.coachId)+'</td><td>'+esc(c.name)+'</td><td>'+esc(c.tag||c.type)+'</td><td>'+esc(c.level)+'</td><td>'+esc(orgText(c))+'</td><td class="mono" style="font-size:12px">'+esc(c.joinDate)+'</td><td>'+esc(c.status||'在职')+'</td><td class="note">'+Object.keys(c.extra).length+' 项</td></tr>').join('')+'</tbody></table></div>':'')+
    '<div class="row-actions" style="margin-top:14px">'+(missingReq.length?'<span class="errs">请对应：'+missingReq.join('、')+'</span>':'<span class="note">导入后名单共 '+P.merged.size+' 人</span>')+'<button class="btn primary" id="imp-go"'+(missingReq.length||!P.out.size||Store.readOnly?' disabled':'')+'>确认导入</button></div></div>';
-  $('#imp-cancel').onclick=()=>{IMP=null;renderImport()};
-  const sh=$('#imp-sheet');if(sh)sh.onchange=()=>{impSetSheet(sh.value);renderImport()};
-  const ih=$('#imp-hdr');ih.oninput=()=>{clearTimeout(ih._t);ih._t=setTimeout(()=>{const n=Math.max(1,parseInt(ih.value)||1)-1;impSetHeader(Math.min(n,IMP.rows.length-1));ih.blur();renderImport()},600)};
-  box.querySelectorAll('[data-map]').forEach(s=>s.onchange=()=>{const k=s.dataset.map,v=s.value===''?null:+s.value;Object.keys(IMP.map).forEach(x=>{if(IMP.map[x]===v)delete IMP.map[x]});if(v==null)delete IMP.map[k];else{IMP.map[k]=v;IMP.extras.delete(v)}renderImport()});
-  box.querySelectorAll('[data-ex]').forEach(c=>c.onchange=()=>{const ci=+c.dataset.ex;c.checked?IMP.extras.add(ci):IMP.extras.delete(ci);renderImport()});
-  $('#imp-retire').onchange=e=>{IMP.retire=e.target.checked;renderImport()};
+  $('#imp-cancel').onclick=()=>{IMP=null;renderImport(true)};
+  const sh=$('#imp-sheet');if(sh)sh.onchange=()=>{impSetSheet(sh.value);renderImport(true)};
+  const ih=$('#imp-hdr');ih.oninput=()=>{clearTimeout(ih._t);ih._t=setTimeout(()=>{const n=Math.max(1,parseInt(ih.value)||1)-1;impSetHeader(Math.min(n,IMP.rows.length-1));ih.blur();renderImport(true)},600)};
+  box.querySelectorAll('[data-map]').forEach(s=>s.onchange=()=>{const k=s.dataset.map,v=s.value===''?null:+s.value;Object.keys(IMP.map).forEach(x=>{if(IMP.map[x]===v)delete IMP.map[x]});if(v==null)delete IMP.map[k];else{IMP.map[k]=v;IMP.extras.delete(v)}renderImport(true)});
+  box.querySelectorAll('[data-ex]').forEach(c=>c.onchange=()=>{const ci=+c.dataset.ex;c.checked?IMP.extras.add(ci):IMP.extras.delete(ci);renderImport(true)});
+  $('#imp-retire').onchange=e=>{IMP.retire=e.target.checked;renderImport(true)};
   $('#imp-go').onclick=async()=>{const b=$('#imp-go');b.disabled=true;b.textContent='正在导入…';
     const Q=impParse(),now=Date.now();
     const ok=await safe(async()=>{
@@ -2431,7 +2437,7 @@ function renderImpFlow(box){
       const h={at:now,by:meId(),file:IMP.file,sheet:IMP.wb.SheetNames.length>1?IMP.sheet:'',rows:Q.out.size,added:Q.added,updated:Q.updated,same:Q.same,retired:Q.retired,invalid:Q.invalid.length,fields:RF.filter(f=>IMP.map[f[0]]!=null).map(f=>f[1]).concat([...IMP.extras].map(ci=>IMP.hdr[ci]))};
       await Store.set('imports',uid('IM'),h);
     });
-    if(ok){toast('已导入：新增 '+Q.added+'，更新 '+Q.updated);IMP=null;renderImport()}else{b.disabled=false;b.textContent='确认导入'}};
+    if(ok){toast('已导入：新增 '+Q.added+'，更新 '+Q.updated);IMP=null;renderImport(true)}else{b.disabled=false;b.textContent='确认导入'}};
 }
 async function saveFile(fn,data){
   let dl=null;if(window.claude&&window.claude.use){try{dl=await window.claude.use('downloads')}catch(e){}}
@@ -2484,7 +2490,7 @@ async function loadSample(){
   }
   const now=Date.now();
   [['complaint','Mia Santos','T20418','上课迟到 8 分钟，未提前告知家长','家长在投诉渠道反馈：老师迟到 8 分钟进入教室，没有提前在群里说明。',5],['refund','Kevin Cruz','T18833','退费原因：老师未按教材授课，内容随意','退费申请备注：最近三节课老师没有用课件，聊天为主。',22]].forEach(([src,n,id,s,det,ago])=>{const c={src,qcId:'',coachName:n,coachId:id,student:'',lesson:'',lessonDate:addDays(today(),-1),reportedAt:now-ago*H,summary:s,detail:det,status:'pending_verify',assigneeId:'',assigneeName:'示例质检员',violation:'',penalty:'',note:'',events:[{at:now-ago*H,by:'',type:'create',text:'手动新建（示例）'}]};c.id=uid('GD');Store.data.cases[c.id]=c});
-  if(!Object.keys(Store.data.refunds).length){const its=[];[['T18833','Kevin Cruz',[2,3,1,8]],['T17654','Ryan Dela Cruz',[5,4,6]],['T20418','Mia Santos',[9,12,7]],['T19876','Chloe Tan',[3]]].forEach(([id,n,ls],ci)=>ls.forEach((l,i)=>its.push({k:'o:RF'+ci+i,coachId:id,coachName:n,date:addDays(today(),-(5+i*9+ci*3)),lessonNo:l,cat:catOf(l),order:'RF'+ci+i,student:'S9'+ci+i,reason:['孩子不适应老师风格','课堂效果不明显','老师迟到','时间安排冲突'][i%4]})));Store.data.refunds={c000:{id:'c000',items:its},meta:{id:'meta',count:its.length,chunks:1,updatedAt:Date.now(),by:'',file:'示例退费明细.xlsx'}};rebuildRefunds()}
+  if(!Object.keys(Store.data.refunds).length){const its=[];[['T18833','Kevin Cruz',[2,3,1,8]],['T17654','Ryan Dela Cruz',[5,4,6]],['T20418','Mia Santos',[9,12,7]],['T19876','Chloe Tan',[3]]].forEach(([id,n,ls],ci)=>ls.forEach((l,i)=>its.push({k:'o:RF'+ci+i+'|formal',role:'formal',coachId:id,coachName:n,date:addDays(today(),-(5+i*9+ci*3)),lessonNo:l,cat:catOf(l),order:'RF'+ci+i,student:'S9'+ci+i,reason:['孩子不适应老师风格','课堂效果不明显','老师迟到','时间安排冲突'][i%4]})));Store.data.refunds={c000:{id:'c000',items:its},meta:{id:'meta',count:its.length,chunks:1,updatedAt:Date.now(),by:'',file:'示例退费明细.xlsx'}};rebuildRefunds()}
   if(!Store.data.config.dispatch)Store.data.config.dispatch={id:'dispatch',data:Object.assign(clone(DISP0),{enabled:true,inspectors:[{id:'',name:'示例质检员A',cap:6,std:'all',on:true},{id:'',name:'示例质检员B',cap:6,std:'all',on:true}]}),savedAt:Date.now(),by:''};
   autoRunTried=false;ME.name=saveName;saveLocal();onData();toast('已载入示例数据（仅本地）');
 }

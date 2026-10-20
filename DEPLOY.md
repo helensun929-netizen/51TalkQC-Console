@@ -22,7 +22,9 @@ flowchart LR
 
 ### 2. 运行初始化脚本
 1. 左侧菜单 **SQL Editor** → **New query**。
-2. 打开仓库里的 `supabase/setup.sql`，全部复制粘贴进去，点 **Run**。
+2. 复制初始化脚本，粘贴进去，点 **Run**。脚本可以用以下任一方式拿到：
+   - 用文件包里的 `setup-复制到Supabase.txt`（双击即可用文本编辑打开），全选复制；
+   - 或者先完成第 5 步上传到 GitHub，在仓库网页里点开 `supabase/setup.sql`，点右上角的 **复制**（Copy raw file）按钮。
 3. 看到 `Success. No rows returned` 即完成。脚本可以重复运行，不会删数据。
 
 ### 3. 设置登录方式
@@ -38,7 +40,7 @@ flowchart LR
 - 复制 **Project URL**
 - 复制 **anon public** key（不是 service_role）
 
-用记事本打开仓库里的 `config.js`，填进引号：
+先把这两项记下来。等第 5 步上传到 GitHub 后，直接在网页上改：仓库里点开 `config.js` → 右上角铅笔图标（Edit this file）→ 把两项粘贴进引号 → **Commit changes**。不需要在电脑上打开文件。填好后是这样：
 
 ```js
 window.QC_CONFIG = {
@@ -80,7 +82,7 @@ window.QC_CONFIG = {
 | ① | 课堂质检 → 标准库 → 体验课 → 上传新版 Excel | 上传《单词2.2体验课课程质量检验标准》，填说明，保存 |
 | ② | 课堂质检 → 标准库 → 正课 → 上传新版 Excel | 上传《单词2.2正课 评价标准细则》，填说明，保存 |
 | ③ | 导入 → 教练信息 | 上传教练信息表（如「薪资信息」导出表），确认列对应后导入 |
-| ④ | 导入 → 退费明细 | 上传退费明细，确认「退费时第几节课」那一列对应正确 |
+| ④ | 导入 → 退费明细 | 上传退费明细，确认「体验课教练ID」「正课教练ID」「退费前第几次课」三列对应正确，再在「高退费判定」里选择计入哪类教练 |
 | ⑤ | 教练档案 → 标签设置 | 确认画像标签的下拉选项 |
 | ⑥ | 把网址发给同事注册 | 同事注册后为「待审核」 |
 | ⑦ | 导入 → 成员权限 | 给同事分配：管理员 / 质检专员 / 只读 |
@@ -92,7 +94,12 @@ window.QC_CONFIG = {
 
 ## 日常维护
 
-**更新网页**：拿到新版 `index.html` 后，在仓库里点该文件 → 铅笔旁的 **⋯ → Upload files** 覆盖上传 → Commit。`config.js` 不用动。
+**更新网页**（拿到新版 `index.html` 时）：
+1. 打开 GitHub 仓库首页 → 点右上角 **Add file** → **Upload files**。
+2. 把新的 `index.html` 拖进去（同名文件会直接覆盖），需要时把新的 `README.md`、`DEPLOY.md` 一起拖进去。
+3. 拉到底部点 **Commit changes**。
+4. 等 1–2 分钟，打开工作台按 **Cmd + Shift + R**（Windows 按 Ctrl + F5）强制刷新。
+`config.js` 不要上传、不用动；数据库里的数据也不受影响。
 
 **备份数据**：Supabase 后台 **Table Editor → docs → Export → CSV**，建议每月导出一次。
 
