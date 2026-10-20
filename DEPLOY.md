@@ -61,6 +61,17 @@ window.QC_CONFIG = {
 
 > 免费版 GitHub Pages 要求仓库公开。仓库里只有代码，没有业务数据，也不含质检标准内容。
 
+### 5+. 把两个组件放进仓库（推荐，国内同事打开更稳）
+网页要用两个公开的程序组件：数据库组件 `supabase.min.js` 和表格组件 `xlsx.full.min.js`。仓库里没有时，网页会依次去国内镜像、海外 CDN 下载，部分公司网络会全部拦截，同事就会看到「数据库组件加载失败」。把它们放进仓库后，只要能打开网页就能加载。
+
+1. 用你自己的 Chrome 打开下面两个链接，每打开一个按 **Cmd + S**（Windows 按 Ctrl + S）保存，文件名保持不变：
+   - https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js
+   - https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js
+2. 在电脑上新建一个叫 `vendor` 的文件夹，把这两个文件放进去。
+3. 仓库首页 → **Add file → Upload files** → 把整个 `vendor` 文件夹拖进去 → **Commit changes**。
+4. 上传后仓库里应该有 `vendor/supabase.min.js` 和 `vendor/xlsx.full.min.js`。
+
+
 ### 6. 开启 Pages
 仓库 **Settings → Pages**：
 - Source：**Deploy from a branch**
@@ -116,7 +127,8 @@ window.QC_CONFIG = {
 | 打开显示「还没有配置数据库」 | `config.js` 没填或填错，检查 URL 和 anon key |
 | 注册后一直显示「等待管理员开通」 | 正常，管理员在「导入 → 成员权限」分配角色后刷新 |
 | 保存时提示「只有查看权限」 | 当前账号是只读或待审核，请管理员调整角色 |
-| 上传 Excel 提示组件加载失败 | 网络拦截了 cdnjs，换网络或稍后重试 |
+| 打开显示「数据库组件加载失败」 | 同事的网络拦截了 CDN。按第 5+ 步把两个组件放进仓库的 `vendor` 文件夹；临时也可以换手机热点打开 |
+| 上传 Excel 提示组件加载失败 | 同上，`vendor/xlsx.full.min.js` 放进仓库后即可 |
 | 别人的修改没有马上出现 | 实时同步未开启：重新运行一次 `setup.sql` 最后一段 |
 | 国内打开慢 | GitHub Pages 和 Supabase 都在境外；如需更稳定，可以后续迁到国内托管 |
 

@@ -7,7 +7,7 @@
 <title>质检工作台</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media=&quot;all&quot;">
 <style>
 [hidden]{display:none!important}img{max-width:100%}body{margin:0}
 
@@ -733,7 +733,21 @@ textarea.inp{width:100%;min-height:72px;resize:vertical;line-height:1.6}
 
 <script>window.QC_BUILD="github";</script>
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+/* 依次尝试多个下载源：仓库内 vendor/ → 国内镜像 → 海外 CDN */
+window.QC_LIBS={
+ supabase:{test:function(){return window.supabase&&window.supabase.createClient},src:['vendor/supabase.min.js','https://registry.npmmirror.com/@supabase/supabase-js/2.45.4/files/dist/umd/supabase.min.js','https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js','https://fastly.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js','https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js']},
+ xlsx:{test:function(){return window.XLSX&&window.XLSX.read},src:['vendor/xlsx.full.min.js','https://registry.npmmirror.com/xlsx/0.18.5/files/dist/xlsx.full.min.js','https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js','https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js','https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js']}
+};
+window.qcLoadLib=function(name){var L=window.QC_LIBS[name];if(L.p)return L.p;
+ L.p=new Promise(function(res,rej){var i=0;function next(){if(L.test())return res();if(i>=L.src.length){L.p=null;return rej(new Error(name+' load failed'))}
+  var s=document.createElement('script'),done=false;s.src=L.src[i++];
+  var t=setTimeout(function(){if(!done){done=true;next()}},10000);
+  s.onload=function(){if(done)return;done=true;clearTimeout(t);L.test()?res():next()};
+  s.onerror=function(){if(done)return;done=true;clearTimeout(t);next()};
+  document.head.appendChild(s)}next()});return L.p};
+window.qcLoadLib('supabase').catch(function(){});
+</script>
 <script>
 (function(){
 'use strict';
@@ -1004,7 +1018,8 @@ function showGate(kind,info){
 }
 const hideGate=()=>{const g=$('#gate');if(g)g.hidden=true};
 async function startSupabase(C){
-  if(!window.supabase){showGate('error','数据库组件加载失败，请检查网络后刷新');return}
+  if(!(window.supabase&&window.supabase.createClient)&&window.qcLoadLib){try{await window.qcLoadLib('supabase')}catch(e){}}
+  if(!(window.supabase&&window.supabase.createClient)){showGate('error','数据库组件加载失败：几个下载源都连不上。请换个网络（例如手机热点）后刷新；如果一直这样，请把这个提示截图发给管理员。');return}
   SB=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey);
   const {data:{session}}=await SB.auth.getSession();
   if(!session){showGate('login');return}
@@ -2329,7 +2344,7 @@ function renderRimpFlow(box){
 let impTab='roster', IMP=null;
 const RF=[['coachId','教练 ID',true,['业务系统编号','系统编号','教练id','老师id','教师id','工号','教练编号','老师编号','教师编号','teacherid','id','编号']],['name','姓名',true,['教练姓名','老师姓名','教师姓名','姓名','真实姓名','中文名','name']],['wecom','企微名称',false,['企微名称','企业微信名称','企微昵称','企微名','企业微信']],['level','教练等级',false,['教练等级','老师等级','等级','级别']],['tag','教练标签',false,['教练标签','老师标签','标签','教练类别']],['type','用工类型',false,['教练类型','用工类型','岗位类型','合作类型','用工性质','全兼职']],['team','教练团队',false,['教练团队','所属团队','团队']],['base','基地',false,['所属基地','基地']],['group','组别',false,['组别','所属组','所属小组','小组','分组','组']],['leader','带教组长',false,['带教组长','组长','带教老师','带教','负责人','leader']],['joinDate','入职日期',false,['入职日期','入职时间','合同生效日期','加入日期','签约日期','入职']],['leaveDate','离职日期',false,['离职时间','离职日期','解约日期','离职']],['status','在职状态',false,['在职状态','教练状态','是否在职','状态']]];
 let xlsxP=null;
-function loadXLSX(){if(window.XLSX)return Promise.resolve(window.XLSX);if(!xlsxP)xlsxP=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';sc.onload=()=>res(window.XLSX);sc.onerror=()=>{xlsxP=null;rej(new Error('表格解析组件加载失败，请检查网络后重试'))};document.head.appendChild(sc)});return xlsxP}
+function loadXLSX(){if(window.XLSX)return Promise.resolve(window.XLSX);if(window.qcLoadLib)return window.qcLoadLib('xlsx').then(()=>window.XLSX,()=>{throw new Error('表格解析组件加载失败，请换个网络后重试')});if(!xlsxP)xlsxP=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';sc.onload=()=>res(window.XLSX);sc.onerror=()=>{xlsxP=null;rej(new Error('表格解析组件加载失败，请检查网络后重试'))};document.head.appendChild(sc)});return xlsxP}
 async function readBook(file){
   const X=await loadXLSX(),buf=await file.arrayBuffer();
   if(/\.csv$/i.test(file.name)){let txt;try{txt=new TextDecoder('utf-8',{fatal:true}).decode(buf)}catch(e){txt=new TextDecoder('gbk').decode(buf)}return X.read(txt.replace(/^﻿/,''),{type:'string',cellDates:true})}

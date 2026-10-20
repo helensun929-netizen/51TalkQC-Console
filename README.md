@@ -174,6 +174,7 @@ flowchart LR
 index.html            工作台网页（全部功能）
 config.js             数据库连接配置（部署时填写）
 supabase/setup.sql    数据库初始化脚本（建表 + 权限 + 实时同步）
+vendor/               数据库组件和表格组件（部署时放入，见 DEPLOY.md 第 5+ 步）
 README.md             本说明
 DEPLOY.md             部署步骤
 ```
