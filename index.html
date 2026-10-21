@@ -785,6 +785,10 @@ th{border-bottom-color:rgba(var(--rgb-panel),.14)}
 .stats.s5{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media (max-width:1180px){.stats.s5{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:900px){.stats.s5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* 质检专员：隐藏经营模块和管理页面 */
+.role-qc .grp-ops,.role-qc .nav-item.plan,.role-qc .nav-item[data-view=import],.role-qc .nav-item[data-view=settings]{display:none!important}
+.role-tbl td.no{color:var(--label)}.role-tbl td.yes{color:var(--strong)}
+.role-tbl td:first-child{color:var(--text)}
 
 </style>
 </head>
@@ -803,7 +807,7 @@ th{border-bottom-color:rgba(var(--rgb-panel),.14)}
       <div class="nav-group">工作空间</div>
       <button class="nav-item" data-view="overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg><span class="l">总览</span></button>
       <button class="nav-item" data-view="tasks"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg><span class="l">任务中心</span><span class="cnt" id="cnt-task" hidden></span></button>
-      <div class="nav-group">经营 · 转化 <em>规划中</em></div>
+      <div class="nav-group grp-ops">经营 · 转化 <em>规划中</em></div>
       <div class="nav-item plan" aria-disabled="true" title="规划中，经营数据接入后开放"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg><span class="l">经营盘</span></div>
       <div class="nav-item plan" aria-disabled="true" title="规划中，经营数据接入后开放"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><span class="l">转化分析</span></div>
       <div class="nav-item plan" aria-disabled="true" title="规划中，经营数据接入后开放"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span class="l">订单与退费</span></div>
@@ -1333,7 +1337,8 @@ function renderMembers(box){
   box.innerHTML='<div class="panel loading">正在读取成员…</div>';
   loadMembers().then(ms=>{
     const admins=ms.filter(m=>m.role==='admin').length;
-    box.innerHTML='<div class="banner info"><div>让同事打开工作台网址，用工作邮箱注册；注册后会出现在下面，状态为「待审核」，给他分配角色后刷新即可使用。<br><b>管理员</b>：改标准、导入教练和退费、派发设置、成员权限 · <b>质检专员</b>：录入质检、处理任务、工单和培训 · <b>只读</b>：查看</div></div>'+
+    box.innerHTML='<div class="banner info"><div>让同事打开工作台网址，用工作邮箱注册；注册后会出现在下面，状态为「待审核」，给他分配角色后刷新即可使用。</div></div>'+
+    '<div class="panel"><div class="p-label">角色权限</div><div class="tbl-wrap"><table class="role-tbl"><thead><tr><th></th><th>管理员</th><th>质检专员</th><th>只读</th></tr></thead><tbody>'+[['总览 · 质检指标','✓','✓','✓'],['总览 · 经营指标、经营 · 转化模块','✓','—','✓'],['课堂质检、投诉管理、培训跟踪、工单台、通知中心','✓ 可编辑','✓ 可编辑','✓ 只看'],['任务中心','✓ 全部','✓ 自己的待办 + 全部进度','✓ 只看'],['教练档案（含退费明细，不含业绩）','✓','✓','✓'],['教练业绩等经营数据（接入后）','✓','—','✓'],['导入（教练信息、退费明细）、设置、成员权限','✓','—','—'],['修改质检标准、处罚规则、派发设置','✓','—','—']].map(r=>'<tr><td>'+r[0]+'</td>'+r.slice(1).map(x=>'<td class="'+(x==='—'?'no':'yes')+'">'+x+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="note" style="margin:8px 0 0">权限同时由数据库规则控制：质检专员即使知道网址，也读不到经营数据。</p></div>'+
     '<div class="panel"><div class="p-label">成员 · '+ms.length+' 人</div><div class="tbl-wrap"><table><thead><tr><th>姓名</th><th>邮箱</th><th>角色</th><th>注册时间</th><th></th></tr></thead><tbody>'+ms.map(m=>'<tr><td><input class="inp" data-mn="'+m.user_id+'" value="'+esc(m.name||'')+'" style="width:140px"'+(IS_ADMIN?'':' disabled')+'></td><td style="font-size:12.5px">'+esc(m.email||'')+(m.user_id===ME.id?' <span class="chip plain c-ok" style="font-size:10px;padding:1px 6px">我</span>':'')+'</td><td><select class="inp" data-mr="'+m.user_id+'"'+(IS_ADMIN?'':' disabled')+'>'+Object.entries(ROLE_L).map(([k,l])=>'<option value="'+k+'"'+(m.role===k?' selected':'')+'>'+l+'</option>').join('')+'</select></td><td class="mono" style="font-size:12px">'+(m.created_at?fmtT(new Date(m.created_at).getTime()):'')+'</td><td>'+(IS_ADMIN?'<button class="btn sm" data-ms="'+m.user_id+'">保存</button>':'')+'</td></tr>').join('')+'</tbody></table></div></div>';
     box.querySelectorAll('[data-ms]').forEach(b=>b.onclick=async()=>{const id=b.dataset.ms,role=box.querySelector('[data-mr="'+id+'"]').value,name=box.querySelector('[data-mn="'+id+'"]').value.trim();
       const cur=ms.find(m=>m.user_id===id);if(cur.role==='admin'&&role!=='admin'&&admins<=1)return toast('至少要保留一位管理员');
@@ -1410,6 +1415,7 @@ async function runWrites(writes){for(const w of writes){if(w[0]==='set')await St
 const VIEWS=['arch','overview','tasks','qc','complaints','training','cases','notices','coaches','import','settings'];
 let view='overview', qcTab='entry';
 function go(v,opt){
+  if(!viewAllowed(v)){toast('当前账号没有这个页面的权限');v='overview'}
   view=v; if(opt&&opt.tab)qcTab=opt.tab;
   document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=='v-'+v);
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
@@ -1427,6 +1433,12 @@ document.addEventListener('click',e=>{
   const tk=e.target.closest('[data-task]');if(tk){openDrawer('task',tk.dataset.task);return}
   const c=e.target.closest('[data-coach]');if(c){openDrawer('coach',c.dataset.coach);return}
 });
+/* ---------- 角色可见范围：质检专员只看质检模块，经营模块与管理页面不开放 ---------- */
+const ROLE=()=>Store.backend==='supabase'?SB_ROLE:(Store.readOnly?'viewer':'admin');
+const isQcOnly=()=>ROLE()==='qc';
+const QC_BLOCK=['import','settings','arch','ops','conv','orders'];
+const viewAllowed=v=>!(isQcOnly()&&QC_BLOCK.includes(v));
+const canOps=()=>!isQcOnly();
 const VIEW_NAME={arch:'架构蓝图',overview:'总览',tasks:'任务中心',qc:'课堂质检',complaints:'投诉管理',training:'培训跟踪',cases:'工单台',notices:'通知中心',coaches:'教练档案',import:'导入',settings:'设置'};
 const VIEW_GRP={overview:'工作空间',tasks:'工作空间',qc:'质检 · 流程',complaints:'质检 · 流程',training:'质检 · 流程',cases:'质检 · 流程',notices:'质检 · 流程',coaches:'数据',import:'数据',settings:'数据',arch:'数据'};
 /* ---------- 全局筛选：周次 / 教练类型 / 团队（作用于任务、质检记录、培训、工单、教练档案） ---------- */
@@ -1466,6 +1478,8 @@ function renderTop(){
   const c=$('#crumb');if(c)c.textContent=VIEW_NAME[view]||'';const g=$('#crumb-g');if(g)g.textContent=VIEW_GRP[view]||'工作台';
   const a=$('#avatar');if(a){const n=(ME&&ME.name)||'';a.textContent=n?n.slice(-2):'QC';a.title=(n?n+' · ':'')+'账号与退出登录'}
   const tp=$('.top-pill');if(tp)tp.innerHTML='<i'+(Store.mode==='local'?' style="background:var(--warn)"':'')+'></i>'+(Store.mode==='local'?'本地模式':'团队共享 · 实时同步');
+  document.body.classList.toggle('role-qc',isQcOnly());
+  if(!viewAllowed(view)){view='overview';document.querySelectorAll('.view').forEach(x=>x.hidden=x.id!=='v-overview');document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view==='overview'))}
   renderGF();applyRail();
 }
 function render(){
@@ -1684,8 +1698,8 @@ function renderOverview(){
   const recentCs=[...cs].sort((a,b)=>lastAt(b)-lastAt(a)).slice(0,5);
   const ws=weekStart(today());
   el.innerHTML='<div class="v-head"><div><div class="eyebrow"><span class="dot"></span>'+ds+' · 第 '+isoWeek(ws)+' 周</div><h1>今天有 <em>'+open.length+'</em> 条工单、<em>'+openTr.length+'</em> 位教练待复检</h1><p>'+(Store.mode==='shared'?'团队共享数据，实时同步。':'本地模式数据，只保存在这台电脑的浏览器里。')+'</p></div><div class="actions"><button class="btn" data-goto="cases">工单台</button><button class="btn primary" data-goto="qc" data-tab="entry">录入质检 →</button></div></div>'+
-  '<div class="row-lab"><b>经营</b><span>本周 vs 上周</span><i></i><span class="chip plain c-mute">待接入</span></div>'+
-  '<div class="stats ops">'+OPS.map(([l,c])=>'<div class="stat plan" style="--bar:'+c+'"><div class="num">—</div><div class="lab">'+l+'</div><div class="plan-n">经营数据接入后显示</div></div>').join('')+'</div>'+
+  (canOps()?'<div class="row-lab"><b>经营</b><span>本周 vs 上周</span><i></i><span class="chip plain c-mute">待接入</span></div>'+
+  '<div class="stats ops">'+OPS.map(([l,c])=>'<div class="stat plan" style="--bar:'+c+'"><div class="num">—</div><div class="lab">'+l+'</div><div class="plan-n">经营数据接入后显示</div></div>').join('')+'</div>':'')+
   '<div class="row-lab"><b>质检</b><span>今日 · 近 7 天</span><i></i></div>'+
   '<div class="stats">'+S.map(s=>'<div class="stat" style="--sc:'+s.col+';--bar:'+s.bar+'">'+spark(s.sp,s.col)+'<div class="num">'+s.n+(s.u?'<small>'+s.u+'</small>':'')+'</div><div class="lab">'+s.l+'</div></div>').join('')+'</div>'+
   '<div class="gridm">'+

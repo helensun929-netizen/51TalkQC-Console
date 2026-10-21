@@ -107,6 +107,8 @@ window.QC_CONFIG = {
 
 ## 日常维护
 
+**更新权限规则**（新版说明里提到「需要重新运行 setup.sql」时）：Supabase 后台 **SQL Editor → New query**，把最新的 `setup-复制到Supabase.txt` 全部粘贴进去点 **Run**。脚本可以重复运行，不会删除数据。
+
 **更新网页**（拿到新版 `index.html` 时）：
 1. 打开 GitHub 仓库首页 → 点右上角 **Add file** → **Upload files**。
 2. 把新的 `index.html` 拖进去（同名文件会直接覆盖），需要时把新的 `README.md`、`DEPLOY.md` 一起拖进去。
