@@ -763,6 +763,29 @@ th{border-bottom-color:rgba(var(--rgb-panel),.14)}
 .gf-sel select{max-width:210px}
 @media (max-width:900px){.nav-group,.nav-item.plan{display:none}}
 
+/* 投诉管理 */
+.cpl-it{display:grid;grid-template-columns:minmax(0,180px) auto minmax(0,1fr) auto;gap:8px;align-items:center}
+.cpl-res{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(var(--rgb-text),.06);font-size:13px}
+.cpl-res:last-child{border-bottom:0}
+.cpl-close{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:10px;border-top:1px dashed rgba(var(--rgb-text),.12)}
+.pen-tbl td{vertical-align:top;padding:6px 4px}
+.pen-tbl .inp{width:100%;min-width:90px;font-size:12px}
+.pen-tbl textarea.inp{min-height:52px}
+@media (max-width:620px){.cpl-it{grid-template-columns:1fr auto}.cpl-it .inp[data-it-pen]{grid-column:1/-1}}
+.topbar{background:rgba(255,255,255,.72)}
+:root[data-theme="dark"] .topbar{background:rgba(20,26,44,.78)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .topbar{background:rgba(20,26,44,.78)}}
+.cpl-due{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border-radius:18px;background:var(--w-yel);border:1px solid rgba(252,236,97,.6)}
+.cpl-due>div{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.cpl-due b{font-size:14px;color:var(--strong)}
+.cpl-due span{font-size:12px;color:var(--text-soft)}
+.cpl-due.over{background:linear-gradient(140deg,rgba(229,72,77,.12),rgba(255,255,255,.5));border-color:rgba(229,72,77,.35)}
+.cpl-bar{display:block;height:6px;border-radius:999px;background:rgba(var(--rgb-text),.08);overflow:hidden;margin-top:4px}
+.cpl-bar em{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#FCEC61,#F5C400)}
+.stats.s5{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:1180px){.stats.s5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.stats.s5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 </head>
 <body>
@@ -786,6 +809,7 @@ th{border-bottom-color:rgba(var(--rgb-panel),.14)}
       <div class="nav-item plan" aria-disabled="true" title="规划中，经营数据接入后开放"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span class="l">订单与退费</span></div>
       <div class="nav-group">质检 · 流程</div>
       <button class="nav-item" data-view="qc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><path d="M8 5H6a1.5 1.5 0 0 0-1.5 1.5v13A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 18 5h-2"/><path d="M8.5 13l2.5 2.5 4.5-5"/></svg><span class="l">课堂质检</span></button>
+      <button class="nav-item" data-view="complaints"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><span class="l">投诉管理</span><span class="cnt" id="cnt-cpl" hidden></span></button>
       <button class="nav-item" data-view="training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 9L12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v4.5c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3V11"/><path d="M21.5 9v5"/></svg><span class="l">培训跟踪</span><span class="cnt" id="cnt-tr" hidden></span></button>
       <button class="nav-item" data-view="cases"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V14a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2.2"/></svg><span class="l">工单台</span><span class="cnt" id="cnt-cases" hidden></span></button>
       <button class="nav-item" data-view="notices"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span class="l">通知中心</span><span class="cnt" id="cnt-notice" hidden></span></button>
@@ -959,6 +983,7 @@ th{border-bottom-color:rgba(var(--rgb-panel),.14)}
       <section class="view" id="v-overview" hidden></section>
       <section class="view" id="v-tasks" hidden></section>
       <section class="view" id="v-qc" hidden></section>
+      <section class="view" id="v-complaints" hidden></section>
       <section class="view" id="v-training" hidden></section>
       <section class="view" id="v-cases" hidden></section>
       <section class="view" id="v-notices" hidden></section>
@@ -1163,9 +1188,9 @@ const trOverdue=tr=>trOpen(tr)&&isDate(tr.due)&&daysLeft(tr.due)<0;
 /* =====================================================================
    DATA LAYER — shared db on claude.ai, localStorage elsewhere
    ===================================================================== */
-const COLS=['qc','training','cases','roster','config','imports','ctags','tasks','runs','refunds'];
+const COLS=['qc','training','cases','roster','config','imports','ctags','tasks','runs','refunds','complaints'];
 const LSK='qcwb-data-v1', DRK='qcwb-draft-v2';
-const Store={mode:'loading',db:null,readOnly:false,data:{qc:{},training:{},cases:{},roster:{},config:{},imports:{},ctags:{},tasks:{},runs:{},refunds:{},stdver:{}},loaded:{},
+const Store={mode:'loading',db:null,readOnly:false,data:{qc:{},training:{},cases:{},roster:{},config:{},imports:{},ctags:{},tasks:{},runs:{},refunds:{},complaints:{},stdver:{}},loaded:{},
   async lease(c,id){if(this.mode!=='shared')return true;try{const r=await this.db.collection(c).doc(id).acquire({holder:(ME.id||'anon')+'-'+Math.random().toString(36).slice(2,8),ttlMs:90000});return !!r.acquired}catch(e){return false}},
   async fresh(c,id){if(this.mode!=='shared')return this.data[c][id]||null;try{const d=await this.db.collection(c).doc(id).get();return d.exists?d.data():null}catch(e){return null}},
   async listStdver(std){
@@ -1382,7 +1407,7 @@ async function runWrites(writes){for(const w of writes){if(w[0]==='set')await St
 /* =====================================================================
    NAVIGATION + RENDER
    ===================================================================== */
-const VIEWS=['arch','overview','tasks','qc','training','cases','notices','coaches','import','settings'];
+const VIEWS=['arch','overview','tasks','qc','complaints','training','cases','notices','coaches','import','settings'];
 let view='overview', qcTab='entry';
 function go(v,opt){
   view=v; if(opt&&opt.tab)qcTab=opt.tab;
@@ -1398,13 +1423,14 @@ document.addEventListener('click',e=>{
   const o=e.target.closest('[data-case]');if(o){openDrawer('case',o.dataset.case);return}
   const q=e.target.closest('[data-qc]');if(q){openDrawer('qc',q.dataset.qc);return}
   const t=e.target.closest('[data-tr]');if(t){openDrawer('tr',t.dataset.tr);return}
+  const cp=e.target.closest('[data-cpl]');if(cp){openDrawer('cpl',cp.dataset.cpl);return}
   const tk=e.target.closest('[data-task]');if(tk){openDrawer('task',tk.dataset.task);return}
   const c=e.target.closest('[data-coach]');if(c){openDrawer('coach',c.dataset.coach);return}
 });
-const VIEW_NAME={arch:'架构蓝图',overview:'总览',tasks:'任务中心',qc:'课堂质检',training:'培训跟踪',cases:'工单台',notices:'通知中心',coaches:'教练档案',import:'导入',settings:'设置'};
-const VIEW_GRP={overview:'工作空间',tasks:'工作空间',qc:'质检 · 流程',training:'质检 · 流程',cases:'质检 · 流程',notices:'质检 · 流程',coaches:'数据',import:'数据',settings:'数据',arch:'数据'};
+const VIEW_NAME={arch:'架构蓝图',overview:'总览',tasks:'任务中心',qc:'课堂质检',complaints:'投诉管理',training:'培训跟踪',cases:'工单台',notices:'通知中心',coaches:'教练档案',import:'导入',settings:'设置'};
+const VIEW_GRP={overview:'工作空间',tasks:'工作空间',qc:'质检 · 流程',complaints:'质检 · 流程',training:'质检 · 流程',cases:'质检 · 流程',notices:'质检 · 流程',coaches:'数据',import:'数据',settings:'数据',arch:'数据'};
 /* ---------- 全局筛选：周次 / 教练类型 / 团队（作用于任务、质检记录、培训、工单、教练档案） ---------- */
-const GF_VIEWS=['tasks','qc','training','cases','coaches'];
+const GF_VIEWS=['tasks','qc','complaints','training','cases','coaches'];
 const lsGet=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let GF=Object.assign({week:'',type:'',team:''},lsGet('qc-gf',{}));
@@ -1449,8 +1475,9 @@ function render(){
   setCnt('#cnt-cases',openCases);setCnt('#cnt-notice',cs.filter(c=>c.status==='pending_notice').length);
   setCnt('#cnt-tr',trs.filter(t=>trOpen(t)&&isDate(t.due)&&daysLeft(t.due)<=3).length);
   setCnt('#cnt-task',myTickets().filter(t=>t.open).length);
+  {const k=cplCounts();setCnt('#cnt-cpl',k.notify+k.over+k.appeal+k.fb);if(k.over&&!render._cplWarned&&Store.ready()){render._cplWarned=true;setTimeout(()=>toast('有 '+k.over+' 条投诉已满 48 小时未申诉，请到「投诉管理」确认属实'),900)}}
   renderRail();
-  const R={overview:renderOverview,tasks:renderTasks,qc:renderQc,training:renderTraining,cases:renderCases,notices:renderNotices,coaches:renderCoaches,import:renderImport,settings:renderSettings}[view];
+  const R={overview:renderOverview,tasks:renderTasks,qc:renderQc,complaints:renderComplaints,training:renderTraining,cases:renderCases,notices:renderNotices,coaches:renderCoaches,import:renderImport,settings:renderSettings}[view];
   if(R)R();
   if(cur)refreshDrawer();
 }
@@ -1466,9 +1493,12 @@ function renderRail(){
   $('#due-c').textContent=trs.length?trs.length+' 位':'';
   $('#dues').innerHTML=trs.length?trs.slice(0,5).map(({t,d})=>'<button class="alert-item" data-tr="'+t.id+'"><span class="t">'+esc(t.coachName)+' · '+SD(t.std).label+'复检</span><span class="m"><span>首检 '+esc(slT(t.firstLabel,t.firstLevel))+'</span><span class="sla '+(d<0?'over':'soon')+'">'+(d<0?'超期 '+(-d)+' 天':d===0?'今天到期':'剩 '+d+' 天')+'</span></span></button>').join(''):'<div class="note">3 天内没有到期的复检</div>';
   const al=Store.all('cases').filter(isOpenCase).map(c=>({c,s:sla(c)})).filter(x=>x.s.left<12).sort((a,b)=>a.s.left-b.s.left);
-  $('#alert-c').textContent=al.length?al.length+' 条':'';
-  {const m=$('#mini-my'),d=$('#mini-due'),l=$('#mini-al');if(m){m.textContent=mt.length;d.textContent=trs.length;l.textContent=al.length}}
-  $('#alerts').innerHTML=al.length?al.slice(0,4).map(({c,s})=>'<button class="alert-item" data-case="'+c.id+'"><span class="t">'+esc(c.summary)+'</span><span class="m"><span>'+c.id+' · '+ST[c.status].t+'</span><span class="sla '+s.cls+'">'+s.txt+'</span></span></button>').join(''):'<div class="note">没有即将超时的工单</div>';
+  const ca=Store.all('complaints').filter(c=>c.status==='notified'&&cplDue(c)&&cplDue(c)-Date.now()<12*H).sort((a,b)=>cplDue(a)-cplDue(b));
+  $('#alert-c').textContent=(al.length+ca.length)?(al.length+ca.length)+' 条':'';
+  {const m=$('#mini-my'),d=$('#mini-due'),l=$('#mini-al');if(m){m.textContent=mt.length;d.textContent=trs.length;l.textContent=al.length+ca.length}}
+  $('#alerts').innerHTML=al.length?al.slice(0,4).map(({c,s})=>'<button class="alert-item" data-case="'+c.id+'"><span class="t">'+esc(c.summary)+'</span><span class="m"><span>'+c.id+' · '+ST[c.status].t+'</span><span class="sla '+s.cls+'">'+s.txt+'</span></span></button>').join(''):'';
+  $('#alerts').innerHTML+=ca.slice(0,4).map(c=>{const l=(cplDue(c)-Date.now())/H;return '<button class="alert-item" data-cpl="'+c.id+'"><span class="t">'+esc(c.coachName||'')+' · '+(l<0?'48 小时已到，待确认属实':'投诉待回复')+'</span><span class="m"><span>'+esc((c.types||[]).join('、'))+'</span><span class="sla '+(l<0?'over':'soon')+'">'+(l<0?'已到期':'剩 '+Math.max(1,Math.round(l))+'h')+'</span></span></button>'}).join('');
+  if(!al.length&&!ca.length)$('#alerts').innerHTML='<div class="note">没有即将超时的工单或投诉</div>';
   let m='';
   if(Store.mode==='loading')m='<div class="mode-badge"><i style="background:var(--mute)"></i>正在连接…</div>';
   else if(Store.backend==='supabase')m='<div class="mode-badge"><i style="background:var(--ok);box-shadow:0 0 0 4px rgba(var(--ok-rgb),.18)"></i><span>团队共享 · 实时同步<br><span class="note">'+esc(ME.name)+' · '+ROLE_L[SB_ROLE]+'</span></span></div><div class="actions" style="margin-top:10px"><button class="btn sm" id="sb-out">退出登录</button></div>';
@@ -1546,12 +1576,12 @@ function refreshDrawer(force){
   if(!cur)return;
   const ae=document.activeElement;
   if(!force&&ae&&$('#drawer').contains(ae)&&/INPUT|TEXTAREA|SELECT/.test(ae.tagName))return;
-  const fn={case:drawCase,qc:drawQc,tr:drawTr,coach:drawCoach,tagcfg:drawTagCfg,task:drawTask,newtask:drawNewTask}[cur.type];
+  const fn={case:drawCase,qc:drawQc,tr:drawTr,coach:drawCoach,tagcfg:drawTagCfg,task:drawTask,newtask:drawNewTask,cpl:drawCpl}[cur.type];
   const html=fn(cur.id);
   if(html==null){$('#drawer').innerHTML='<div class="d-head"><div class="d-top"><span class="note">这条记录已不存在</span><button class="x" aria-label="关闭">✕</button></div></div>'}
   else $('#drawer').innerHTML=html;
   $('#drawer .x').onclick=closeDrawer;
-  const b={case:bindCase,qc:bindQc,tr:bindTr,coach:bindCoach,tagcfg:bindTagCfg,task:bindTask,newtask:bindNewTask}[cur.type];if(html!=null&&b)b(cur.id);
+  const b={case:bindCase,qc:bindQc,tr:bindTr,coach:bindCoach,tagcfg:bindTagCfg,task:bindTask,newtask:bindNewTask,cpl:bindCpl}[cur.type];if(html!=null&&b)b(cur.id);
 }
 const dhead=(ids,title,extra)=>'<div class="d-head"><div class="d-top"><div class="ids">'+ids+'</div><button class="x" aria-label="关闭">✕</button></div><h3>'+title+'</h3>'+(extra||'')+'</div>';
 
@@ -1670,6 +1700,312 @@ function renderOverview(){
 }
 
 /* =====================================================================
+   COMPLAINTS — 投诉管理：导入 → 自动生成违纪通知 → 人工发送 → 教练认可 / 申诉 → 处罚生效 / 撤销 → 记入教练档案
+   ===================================================================== */
+const CPL_ST={
+  to_notify:{t:'待发通知',c:'c-info',col:'var(--info)'},
+  notified:{t:'待教练回复',c:'c-warn',col:'var(--yel)'},
+  appeal:{t:'申诉审核',c:'c-violet',col:'var(--violet)'},
+  confirmed:{t:'属实 · 已处理',c:'c-bad',col:'var(--bad)'},
+  revoked:{t:'申诉成立 · 不处理',c:'c-ok',col:'var(--ok)'},
+  closed:{t:'已关闭',c:'c-mute',col:'var(--mute)'}
+};
+const CPL_OPEN=['to_notify','notified','appeal'];
+const CPL_SRC=['家长','辅导老师','销售'];
+const CPL_CLOSE=['不属实','重复投诉','难以判定','撤销投诉'];
+const CPEN0={policy:'《师资运营管理制度》',replyHours:48,riskN:2,riskDays:90,rules:[]};
+const CPEN=()=>{const d=(Store.data.config.penalty||{}).data||{};return Object.assign({},CPEN0,d,{rules:d.rules||[]})};
+const cplOf=r=>r;
+function cplSrcNorm(v){const t=cellStr(v);const out=[];if(/家长|学员/.test(t))out.push('家长');if(/辅导|LA|班主任/i.test(t))out.push('辅导老师');if(/销售|LPC|顾问/i.test(t))out.push('销售');return out}
+function cplMatch(probType,desc){
+  const P=CPEN(),txt=(cellStr(probType)+' ').replace(/[，、;；\/]/g,','),hits=[];
+  P.rules.forEach(r=>{const kws=[r.type].concat(r.kw||[]).map(k=>cellStr(k)).filter(Boolean);if(kws.some(k=>txt.includes(k))&&!hits.includes(r.type))hits.push(r.type)});
+  if(!hits.length&&desc){P.rules.forEach(r=>{const kws=(r.kw||[]).filter(Boolean);if(kws.some(k=>cellStr(desc).includes(k))&&!hits.includes(r.type))hits.push(r.type)})}
+  return hits;
+}
+/* 同一教练、同一违规类型此前已属实的次数 + 1 */
+function cplCount(c,type){
+  const k=coachKey(c);return 1+Store.all('complaints').filter(x=>x.id!==c.id&&x.status==='confirmed'&&coachKey(x)===k&&(x.final||x.items||[]).some(i=>i.type===type)&&(x.reportedAt||0)<=(c.reportedAt||Date.now())).length;
+}
+function cplPenalty(type,n){
+  const r=CPEN().rules.find(x=>x.type===type);if(!r)return {clause:'',penalty:''};
+  const ps=(r.p||[]).map(cellStr);let i=Math.min(n,ps.length)-1,v='';
+  while(i>=0){v=ps[i];if(v&&v!=='—'&&v!=='-'&&!/^同首次/.test(v))break;if(/^同首次/.test(v)){v=ps[0];break}i--}
+  return {clause:r.clause||'',penalty:v||''};
+}
+function cplItems(c){return (c.types||[]).map(t=>{const n=cplCount(c,t),p=cplPenalty(t,n);const ov=(c.over||{})[t];return {type:t,n,clause:p.clause,penalty:ov!=null&&ov!==''?ov:p.penalty}})}
+const cplShow=c=>c.final||(c.status!=='to_notify'&&c.items&&c.items.length?c.items:null)||cplItems(c);
+const cplDue=c=>c.status==='notified'&&c.notifiedAt?c.notifiedAt+(+CPEN().replyHours||48)*H:0;
+const cplOver=c=>c.status==='notified'&&cplDue(c)&&Date.now()>cplDue(c);
+const cplSrcText=c=>(c.src&&c.src.length?c.src.join('、'):'用户');
+const cnN=n=>['一','二','三','四','五','六','七','八','九','十'][n-1]||String(n);
+const todayCN=()=>{const d=new Date();return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日'};
+function cplItemLines(items,start){if(!items.length)return start+'. 【请选择违规类型并填写处罚】';return items.map((it,i)=>(start+i)+'. '+it.type+'（'+[it.clause,'第'+it.n+'次'].filter(Boolean).join('，')+'）：'+(it.penalty||'【请填写处罚】')).join('\n')}
+const cplDesc=c=>{const d=cellStr(c.coachDesc!=null&&c.coachDesc!==''?c.coachDesc:c.desc).replace(/\s+$/,'');return d+(/[。！？.!?]$/.test(d)?'':'。')};
+const cplWho=c=>c.reporter?c.reporter+'老师':(c.src||[]).includes('销售')?'销售老师':'辅导老师';
+/* 发给教练：投诉情况确认通知（语气委婉，先确认、再说明“如属实”的处理） */
+function cplNotice(list){
+  const P=CPEN(),c0=list[0],hrs=+P.replyHours||48;
+  const head='【投诉情况确认通知】\n'+(c0.coachName||'{教练姓名}')+'老师您好：\n';
+  const ask='\n为了客观了解情况，想先和您确认一下：如果您对以上反馈有不同说明（例如当时的特殊情况、与家长或辅导老师的沟通记录、截图等），请在收到本通知后【'+hrs+'小时】内回复我们，我们会认真核实，不会只听单方面的反馈。\n';
+  const tail='\n如'+hrs+'小时内未收到您的说明，将视为情况属实，并按上述方式处理。\n感谢您一直以来的付出，也希望和您一起把学员的上课体验做得更好，辛苦啦！\n师资运营组\n'+todayCN();
+  if(list.length===1){const c=c0,items=cplItems(c);
+    return head+'近期我们收到了'+cplSrcText(c)+'关于您'+(c.lessonTime?' '+c.lessonTime+' ':'')+'课程（学员ID：'+(c.student||'—')+'）的反馈：'+cplDesc(c)+(c.refund?'家长目前也提出了退费。':'')+'\n'+ask+'\n如经核实情况属实，根据'+P.policy+'，将按以下方式处理：\n'+cplItemLines(items,1)+'\n'+tail}
+  let k=1;const body=list.map((c,i)=>{const items=cplItems(c);const s='（'+cnN(i+1)+'）'+(c.lessonTime?c.lessonTime+'，':'')+cplDesc(c)+'（学员ID：'+(c.student||'—')+'，来自'+cplSrcText(c)+'）\n如属实：\n'+cplItemLines(items,k);k+=items.length;return s}).join('\n');
+  return head+'近期我们收到了几条关于您课程的反馈，整理如下：\n'+body+'\n'+ask+'\n以上处理依据'+P.policy+'。'+tail;
+}
+/* 发给教练：48 小时内的温和提醒 */
+function cplRemindText(c){const P=CPEN();return (c.coachName||'')+'老师您好，提醒一下：'+(c.notifiedAt?fmtD(c.notifiedAt):'近期')+'发给您的投诉情况确认通知（学员ID：'+(c.student||'—')+'），如有需要说明的情况，请在'+(cplDue(c)?fmtT(cplDue(c)):(+P.replyHours||48)+'小时内')+'前回复我们，我们会认真核实。如已了解、没有补充，也可以直接回复“已了解”。谢谢老师～'}
+/* 发给教练：处理结果 */
+function cplResultText(c){const items=cplShow(c);return '【投诉处理结果通知】\n'+(c.coachName||'')+'老师您好：\n关于'+(c.notifiedAt?fmtD(c.notifiedAt):'近期')+'和您确认的反馈（学员ID：'+(c.student||'—')+'），'+(c.coachReply?'感谢您的回复。':'')+'经核实情况属实，根据'+CPEN().policy+'，按以下方式处理：\n'+cplItemLines(items,1)+'\n后续如需要我们协助调整课程或沟通家长，随时联系我们。也相信老师之后会做得更好，辛苦啦！\n师资运营组\n'+todayCN()}
+function cplRevokeText(c){return '【投诉复核结果通知】\n'+(c.coachName||'')+'老师您好：\n感谢您'+(c.appealNote?'提供的说明和材料':'的及时回复')+'。关于'+(c.notifiedAt?fmtD(c.notifiedAt):'近期')+'和您确认的反馈（学员ID：'+(c.student||'—')+'），经复核，情况与反馈有出入，本次不做处理，也不计入任何记录。\n给您带来困扰，非常抱歉，感谢理解与配合！\n师资运营组\n'+todayCN()}
+/* 发给提交人（辅导老师 / 销售）：受理反馈 + 处理结果反馈 */
+function cplAckText(c){return cplWho(c)+'您好：您'+(c.reportedAt?fmtD(c.reportedAt):'')+'反馈的关于教练'+(c.coachName||'')+'（学员ID：'+(c.student||'—')+'）的情况我们已收到，已联系教练核实，预计'+(cplDue(c)?fmtT(cplDue(c)):((+CPEN().replyHours||48)+'小时内'))+'前给您处理结果。学员这边如需先调整课程或安抚家长，辛苦您先跟进，需要我们配合随时说。感谢反馈！'}
+function cplFbText(c){const w=cplWho(c),d=c.reportedAt?fmtD(c.reportedAt):'',hd=w+'您好：关于您'+d+'反馈的教练'+(c.coachName||'')+'（学员ID：'+(c.student||'—')+'）的情况，';
+  if(c.status==='confirmed'){const items=cplShow(c);return hd+'经核实情况属实，已按'+CPEN().policy+'对教练作出处理：'+items.map(i=>i.penalty).filter(Boolean).join('；')+'。辛苦您协助安排学员补课 / 调整教练，并做好家长安抚。感谢您的及时反馈！'}
+  if(c.status==='revoked')return hd+'经与教练核实并查看相关记录，情况与反馈有出入，本次不做处理。我们已提醒教练加强与您的沟通，家长如仍有疑问，可以随时找我们一起处理。感谢理解！';
+  if(c.status==='closed'){const r=c.closeReason;return hd+(r==='重复投诉'?'该情况此前已有反馈并在处理中，本次合并跟进，结果会一并同步给您。':r==='撤销投诉'?'已按您的要求撤销本次反馈，如后续还有问题欢迎随时反馈。':r==='难以判定'?'目前现有材料暂时无法确认具体情况，我们会持续关注该教练后续课程，如有新的截图或记录，欢迎补充给我们。':'经核实暂未发现教练存在违规情况，本次不做处理。如有新的材料，欢迎随时补充。')+'感谢反馈！'}
+  return cplAckText(c)}
+const fmtD=t=>{const d=new Date(t);return (d.getMonth()+1)+'月'+d.getDate()+'日'};
+const cplEv=(text,extra)=>Object.assign({at:Date.now(),by:meId(),text},extra||{});
+
+/* ---------- 列表页 ---------- */
+let cplTab='list',cplF={st:'open',src:'',q:''},CIMP=null;
+const cplFbPending=c=>!c.history&&['confirmed','revoked','closed'].includes(c.status)&&!c.fbDoneAt;
+function cplCounts(){const a=Store.all('complaints');return {fb:a.filter(cplFbPending).length,notify:a.filter(c=>c.status==='to_notify').length,over:a.filter(cplOver).length,appeal:a.filter(c=>c.status==='appeal').length,wait:a.filter(c=>c.status==='notified').length}}
+function renderComplaints(){
+  const el=$('#v-complaints');if(!Store.ready()){el.innerHTML=loadingHtml;return}
+  if(cplTab==='import'&&CIMP&&CIMP.stage){const ae=document.activeElement;if(ae&&el.contains(ae)&&/INPUT|SELECT/.test(ae.tagName)&&!renderComplaints._force)return}
+  renderComplaints._force=false;
+  const all=Store.all('complaints'),k=cplCounts(),P=CPEN(),m0=today().slice(0,7);
+  const month=all.filter(c=>!c.history&&c.reportedAt&&dstr(new Date(c.reportedAt)).slice(0,7)===m0);
+  const decided=all.filter(c=>['confirmed','revoked','closed'].includes(c.status)&&!c.history),rate=decided.length?Math.round(decided.filter(c=>c.status==='confirmed').length/decided.length*100):null;
+  el.innerHTML='<div class="v-head"><div><div class="eyebrow"><span class="dot"></span>Complaints</div><h1>投诉管理</h1><p>导入家长、辅导老师、销售的投诉后，系统按违规类型和次数带出「如属实」的处理方式，生成【投诉情况确认通知】。复制发给教练后，等 48 小时：教练认可或到期未申诉，确认属实并把处理结果反馈给辅导老师 / 销售；教练申诉成立则不做处理。</p></div><div class="actions"><button class="btn primary" data-ct="import">导入投诉</button></div></div>'+
+  (P.rules.length?'':'<div class="banner warn"><div><b>还没有设置处罚规则。</b>导入的投诉无法自动带出处罚。'+(IS_ADMIN?'<button class="link" data-ct="rules">去设置处罚规则</button>':'请管理员在「处罚规则」里设置。')+'</div></div>')+
+  '<div class="stats s5"><div class="stat" style="--bar:var(--info)"><div class="num">'+k.notify+'</div><div class="lab">待发通知</div></div><div class="stat" style="--bar:var(--yel)"><div class="num">'+k.wait+(k.over?'<small> · 已到期 '+k.over+'</small>':'')+'</div><div class="lab">待教练回复（'+(+P.replyHours||48)+' 小时）</div></div><div class="stat" style="--bar:var(--violet)"><div class="num">'+k.appeal+'</div><div class="lab">申诉审核</div></div><div class="stat" style="--bar:var(--grn)"><div class="num">'+k.fb+'</div><div class="lab">待反馈辅导 / 销售</div></div><div class="stat" style="--bar:var(--bad)"><div class="num">'+month.length+(rate!=null?'<small> · 属实率 '+rate+'%</small>':'')+'</div><div class="lab">本月新投诉</div></div></div>'+
+  '<div class="tabs" id="cpl-tabs">'+[['list','投诉列表',all.filter(c=>CPL_OPEN.includes(c.status)).length],['merge','按教练合并通知',null],['import','导入',null],['rules','处罚规则',P.rules.length||null]].map(([t,l,n])=>'<button data-t="'+t+'" class="'+(cplTab===t?'on':'')+'">'+l+(n?' <b>'+n+'</b>':'')+'</button>').join('')+'</div><div id="cpl-body" style="display:flex;flex-direction:column;gap:16px"></div>';
+  $('#cpl-tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(b){cplTab=b.dataset.t;renderComplaints()}};
+  el.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>{cplTab=b.dataset.ct;renderComplaints()});
+  const body=$('#cpl-body');
+  if(cplTab==='import')return renderCplImport(body);
+  if(cplTab==='rules')return renderCplRules(body);
+  if(cplTab==='merge')return renderCplMerge(body);
+  const groups=[['open','处理中',c=>CPL_OPEN.includes(c.status)],['to_notify','待发通知',c=>c.status==='to_notify'],['notified','待教练回复',c=>c.status==='notified'],['over','48 小时已到',cplOver],['fb','待反馈提交人',cplFbPending],['appeal','申诉审核',c=>c.status==='appeal'],['confirmed','属实 · 已处理',c=>c.status==='confirmed'],['revoked','申诉成立',c=>c.status==='revoked'],['closed','已关闭',c=>c.status==='closed'],['all','全部',()=>true]];
+  const g=groups.find(x=>x[0]===cplF.st)||groups[0],q=cplF.q.trim().toLowerCase();
+  const base=all.filter(c=>gfCoachOk(c.coachId,c.coachName)&&gfDateOk(c.reportedAt?dstr(new Date(c.reportedAt)):''));
+  const list=base.filter(g[2]).filter(c=>(!cplF.src||(c.src||[]).includes(cplF.src))&&(!q||(c.id+(c.coachName||'')+(c.coachId||'')+(c.student||'')+(c.desc||'')+(c.reporter||'')).toLowerCase().includes(q))).sort((a,b)=>(cplOver(b)-cplOver(a))||(b.reportedAt||0)-(a.reportedAt||0));
+  body.innerHTML='<div class="toolbar"><div class="filters">'+groups.map(([k2,t,f])=>'<button class="fbtn'+(cplF.st===k2?' on':'')+'" data-st="'+k2+'">'+t+' <b>'+base.filter(f).length+'</b></button>').join('')+'</div><div class="search"><select class="inp" id="cpl-src" aria-label="来源"><option value="">全部来源</option>'+CPL_SRC.map(s=>'<option'+(cplF.src===s?' selected':'')+'>'+s+'</option>').join('')+'</select><input class="inp" id="cpl-q" placeholder="搜教练 / 学员 / 内容" value="'+esc(cplF.q)+'" aria-label="搜索"></div></div>'+
+   '<div class="panel"><div class="tbl-wrap"><table><thead><tr><th>投诉日期</th><th>教练</th><th>来源</th><th>违规类型</th><th>处罚</th><th>回复时限</th><th>状态</th></tr></thead><tbody>'+
+   (list.length?list.slice(0,300).map(c=>{const items=cplShow(c),due=cplDue(c);return '<tr class="click" data-cpl="'+c.id+'"><td class="mono" style="font-size:12px;white-space:nowrap">'+(c.reportedAt?dstr(new Date(c.reportedAt)):'—')+'</td><td style="white-space:nowrap"><div class="sum">'+esc(c.coachName||'—')+'</div><div class="sub mono">'+esc(c.coachId||'')+'</div></td><td style="white-space:nowrap">'+esc(cplSrcText(c))+'</td><td>'+(items.length?items.map(i=>esc(i.type)+(i.n>1?' <span class="chip plain c-bad" style="font-size:10px;padding:0 6px">第'+i.n+'次</span>':'')).join('<br>'):'<span class="chip plain c-warn">待选择</span>')+'</td><td class="note" style="max-width:260px">'+esc(items.map(i=>i.penalty).filter(Boolean).join('；')||'—')+'</td><td class="sla '+(cplOver(c)?'over':due?'soon':'none')+'">'+(due?(cplOver(c)?'已到期':'剩 '+Math.max(1,Math.round((due-Date.now())/H))+'h'):'—')+'</td><td><span class="chip '+CPL_ST[c.status].c+'">'+CPL_ST[c.status].t+(c.status==='closed'&&c.closeReason?' · '+esc(c.closeReason):'')+'</span>'+(cplFbPending(c)?' <span class="chip plain c-warn">待反馈</span>':'')+'</td></tr>'}).join(''):'<tr><td colspan="7" class="note" style="text-align:center;padding:24px">没有符合条件的投诉</td></tr>')+'</tbody></table></div>'+(list.length>300?'<p class="note">只显示前 300 条，请用筛选缩小范围</p>':'')+'</div>';
+  body.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{cplF.st=b.dataset.st;renderComplaints()});
+  $('#cpl-src').onchange=e=>{cplF.src=e.target.value;renderComplaints()};
+  const qi=$('#cpl-q');qi.oninput=()=>{clearTimeout(qi._t);qi._t=setTimeout(()=>{cplF.q=qi.value;renderComplaints();const n=$('#cpl-q');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}},250)};
+}
+
+/* ---------- 按教练合并通知 ---------- */
+function renderCplMerge(body){
+  const pend=Store.all('complaints').filter(c=>c.status==='to_notify'),by={};
+  pend.forEach(c=>{const k=coachKey(c);(by[k]=by[k]||[]).push(c)});
+  const groups=Object.values(by).sort((a,b)=>b.length-a.length);
+  body.innerHTML=groups.length?'<p class="note" style="margin:0">同一位教练有多条待发通知时，可以合并成一条【投诉情况确认通知】发送，序号和违规次数会自动连续。发送后点「已发送」，这几条会一起进入「待教练回复」，48 小时后提醒你确认。</p>'+groups.map((g,i)=>'<div class="panel"><div class="p-label">'+esc(g[0].coachName||'—')+' <span class="mono">'+esc(g[0].coachId||'')+'</span> · '+g.length+' 条 <span class="actions"><button class="btn sm" data-mcopy="'+i+'">复制通知</button><button class="btn sm primary" data-msent="'+i+'"'+(Store.readOnly?' disabled':'')+'>我已发送，标记已通知</button></span></div><div class="notice-text">'+esc(cplNotice(g))+'</div></div>').join(''):'<div class="panel"><div class="empty"><span class="big">没有待发送的通知</span><span>导入投诉后，待发通知会出现在这里。</span></div></div>';
+  body.querySelectorAll('[data-mcopy]').forEach(b=>b.onclick=()=>copy(cplNotice(groups[+b.dataset.mcopy]),'通知已复制，可以粘贴到企业微信发送'));
+  body.querySelectorAll('[data-msent]').forEach(b=>b.onclick=async()=>{const g=groups[+b.dataset.msent],txt=cplNotice(g),now=Date.now();b.disabled=true;
+    const ok=await safe(async()=>{for(const c of g){const items=cplItems(c);await Store.update('complaints',c.id,{status:'notified',notifiedAt:now,notice:txt,items,events:[...(c.events||[]),cplEv('合并发送投诉情况确认通知（'+g.length+' 条）')]})}});
+    if(ok)toast('已标记为已通知，'+(+CPEN().replyHours||48)+' 小时后未回复会提醒');else b.disabled=false});
+}
+
+/* ---------- 抽屉 ---------- */
+function drawCpl(id){
+  const c=Store.get('complaints',id);if(!c)return null;
+  const P=CPEN(),items=cplShow(c),ro=Store.readOnly?' disabled':'',due=cplDue(c);
+  const stg={to_notify:2,notified:3,appeal:3,confirmed:5,revoked:5,closed:5}[c.status];
+  const steps=['导入','发通知','教练回复','结论'];
+  let act='';
+  if(c.status==='to_notify'){
+    act='<div><div class="sec-t">认定与处罚 <span class="note" style="letter-spacing:0;text-transform:none">按「处罚规则」和该教练此前属实次数自动带出，可以修改</span></div>'+
+     '<div id="cpl-items" style="display:flex;flex-direction:column;gap:8px">'+(c.types||[]).map((t,i)=>{const it=items[i]||{};return '<div class="cpl-it"><select class="inp" data-it-type="'+i+'">'+P.rules.map(r=>'<option'+(r.type===t?' selected':'')+'>'+esc(r.type)+'</option>').join('')+(P.rules.some(r=>r.type===t)?'':'<option selected>'+esc(t)+'</option>')+'</select><span class="chip plain '+(it.n>1?'c-bad':'c-mute')+'">第 '+it.n+' 次</span><input class="inp" data-it-pen="'+i+'" value="'+esc(it.penalty||'')+'" placeholder="处罚"><button class="btn sm" data-it-del="'+i+'" title="删除这一项">✕</button></div>'}).join('')+'</div>'+
+     '<div class="actions" style="margin-top:8px"><select class="inp" id="cpl-add" style="max-width:240px"><option value="">＋ 添加违规类型</option>'+P.rules.map(r=>'<option>'+esc(r.type)+'</option>').join('')+'</select></div></div>'+
+     '<div><div class="sec-t">发给教练的情况描述 <span class="note" style="letter-spacing:0;text-transform:none">可改成更客观、委婉的说法，只影响通知文字</span></div><textarea class="inp" id="cpl-cdesc" rows="3">'+esc(c.coachDesc!=null&&c.coachDesc!==''?c.coachDesc:c.desc||'')+'</textarea></div>'+
+     '<div><div class="sec-t">投诉情况确认通知 <span class="manual">复制后人工发送</span></div><div class="notice-text">'+esc(cplNotice([c]))+'</div></div>'+
+     '<div class="actions"><button class="btn" data-ca="copy">复制通知话术</button><button class="btn primary" data-ca="sent"'+ro+(items.length&&items.every(i=>i.penalty)?'':' disabled title="请先选择违规类型并填写处罚"')+'>我已发送，标记已通知</button></div>'+
+     '<div class="cpl-close"><span class="note">核实后不需要通知教练：</span>'+CPL_CLOSE.map(r=>'<button class="btn sm" data-close="'+r+'"'+ro+'>'+r+'</button>').join('')+'</div>';
+  }else if(c.status==='notified'){
+    const left=due?(due-Date.now())/H:0,over=cplOver(c),pct=due?Math.min(100,Math.max(0,(Date.now()-c.notifiedAt)/(due-c.notifiedAt)*100)):0;
+    act=(over?'<div class="cpl-due over"><div><b>'+(+P.replyHours||48)+' 小时已到，教练未提出申诉</b><span>通知于 '+fmtT(c.notifiedAt)+' 发送，到期 '+fmtT(due)+'</span></div><button class="btn primary" data-ca="timeout"'+ro+'>确认属实</button></div>'
+       :'<div class="cpl-due"><div><b>等待教练回复 · 剩 '+Math.max(1,Math.round(left))+' 小时</b><span>通知于 '+fmtT(c.notifiedAt)+' 发送，'+fmtT(due)+' 到期后会在待办和右栏提醒你确认属实</span><i class="cpl-bar"><em style="width:'+pct+'%"></em></i></div><button class="btn sm" data-ca="remind">复制提醒话术</button></div>')+
+     '<div><div class="sec-t">给'+esc(cplWho(c))+'的受理反馈 '+(c.fbAckAt?'<span class="chip plain c-ok">已发送 '+fmtT(c.fbAckAt)+'</span>':'<span class="manual">建议发送</span>')+'</div><div class="notice-text">'+esc(cplAckText(c))+'</div><div class="actions" style="margin-top:8px"><button class="btn sm" data-ca="copyack">复制</button>'+(c.fbAckAt?'':'<button class="btn sm" data-ca="ackdone"'+ro+'>已发送</button>')+'</div></div>'+
+     '<div><div class="sec-t">已发给教练的通知</div><div class="notice-text">'+esc(c.notice||cplNotice([c]))+'</div></div>'+
+     '<div><div class="sec-t">记录教练回复</div><textarea class="inp" id="cpl-reply" placeholder="粘贴教练的回复或申诉理由（可选）"></textarea></div>'+
+     '<div class="actions"><button class="btn bad" data-ca="accept"'+ro+'>教练认可，确认属实</button><button class="btn" data-ca="appeal"'+ro+'>教练申诉，进入审核</button></div>';
+  }else if(c.status==='appeal'){
+    act='<div><div class="sec-t">教练申诉</div><div class="raw">'+esc(c.appealNote||'（未填写申诉内容）')+'</div></div>'+
+     '<div><div class="sec-t">复核说明</div><textarea class="inp" id="cpl-review" placeholder="写明复核依据，例如：截图显示教练已提前 24 小时报备"></textarea></div>'+
+     '<div class="actions"><button class="btn bad" data-ca="keep"'+ro+'>申诉不成立，确认属实</button><button class="btn ok" data-ca="revoke"'+ro+'>申诉成立，不做处理</button></div>';
+  }else if(c.status==='confirmed'){
+    act='<div class="banner bad"><div><b>属实 · 已按规定处理</b>'+(c.history?'（历史记录导入）':'')+'，已记入教练档案'+(c.decidedAt?' · '+fmtT(c.decidedAt):'')+'。</div></div>'+
+     (c.history?'':'<div><div class="sec-t">给'+esc(cplWho(c))+'的处理结果反馈 '+(c.fbDoneAt?'<span class="chip plain c-ok">已反馈 '+fmtT(c.fbDoneAt)+'</span>':'<span class="manual">请发送</span>')+'</div><div class="notice-text">'+esc(cplFbText(c))+'</div><div class="actions" style="margin-top:8px"><button class="btn sm" data-ca="copyfb">复制反馈话术</button>'+(c.fbDoneAt?'':'<button class="btn sm primary" data-ca="fbdone"'+ro+'>我已反馈</button>')+'</div></div>'+
+     '<div><div class="sec-t">给教练的处理结果通知 <span class="note" style="letter-spacing:0;text-transform:none">可选</span></div><div class="notice-text">'+esc(cplResultText(c))+'</div><div class="actions" style="margin-top:8px"><button class="btn sm" data-ca="copyresult">复制</button></div></div>')+
+     (IS_ADMIN&&!Store.readOnly?'<div class="cpl-close"><span class="note">事后发现判定有误：</span><button class="btn sm" data-ca="revoke">撤销处罚</button></div>':'');
+  }else if(c.status==='revoked'){
+    act='<div class="banner info"><div><b>不做处理</b>，不计入违规次数。</div></div>'+'<div><div class="sec-t">给'+esc(cplWho(c))+'的处理结果反馈 '+(c.fbDoneAt?'<span class="chip plain c-ok">已反馈 '+fmtT(c.fbDoneAt)+'</span>':'<span class="manual">请发送</span>')+'</div><div class="notice-text">'+esc(cplFbText(c))+'</div><div class="actions" style="margin-top:8px"><button class="btn sm" data-ca="copyfb">复制反馈话术</button>'+(c.fbDoneAt?'':'<button class="btn sm primary" data-ca="fbdone"'+ro+'>我已反馈</button>')+'</div></div>'+'<div><div class="sec-t">给教练的复核结果通知</div><div class="notice-text">'+esc(cplRevokeText(c))+'</div><div class="actions" style="margin-top:8px"><button class="btn sm" data-ca="copyrevoke">复制</button></div></div>';
+  }else if(c.status==='closed'){
+    act='<div class="banner info"><div>已关闭：<b>'+esc(c.closeReason||'')+'</b>，未通知教练，不计入违规次数。</div></div>'+(c.history?'':'<div><div class="sec-t">给'+esc(cplWho(c))+'的处理结果反馈 '+(c.fbDoneAt?'<span class="chip plain c-ok">已反馈 '+fmtT(c.fbDoneAt)+'</span>':'<span class="manual">请发送</span>')+'</div><div class="notice-text">'+esc(cplFbText(c))+'</div><div class="actions" style="margin-top:8px"><button class="btn sm" data-ca="copyfb">复制反馈话术</button>'+(c.fbDoneAt?'':'<button class="btn sm primary" data-ca="fbdone"'+ro+'>我已反馈</button>')+'</div></div>')+(IS_ADMIN&&!Store.readOnly?'<div class="actions"><button class="btn sm" data-ca="reopen">重新打开</button></div>':'');
+  }
+  return dhead('<span class="src">投诉</span><span class="chip '+CPL_ST[c.status].c+'">'+CPL_ST[c.status].t+'</span><span class="mono note">'+c.id+'</span>',esc(c.coachName||'—')+' <span class="mono" style="font-size:14px;color:var(--text-soft)">'+esc(c.coachId||'')+'</span>','<div class="progress" style="grid-template-columns:repeat(4,1fr)">'+steps.map((s,i)=>'<div class="'+(c.status==='closed'||c.status==='revoked'?(i<stg-1?'done':i===3?'stop':''):(i<stg-1?'done':i===stg-1?'cur':''))+'">'+s+'</div>').join('')+'</div>')+
+  '<div class="d-body"><div class="kv"><div><span>投诉来源</span><b>'+esc(cplSrcText(c))+'</b></div><div><span>提交人</span><b>'+esc([c.reporter,c.dept].filter(Boolean).join(' · ')||'—')+'</b></div><div><span>投诉日期</span><b>'+(c.reportedAt?dstr(new Date(c.reportedAt)):'—')+'</b></div><div><span>上课时间 · 课型</span><b>'+esc([c.lessonTime,c.lessonType].filter(Boolean).join(' · ')||'—')+'</b></div><div><span>学员 ID</span><b class="mono">'+esc(c.student||'—')+'</b></div><div><span>问题类型（原）</span><b>'+esc(c.probType||'—')+'</b></div></div>'+
+  '<div><div class="sec-t">违规问题描述</div><div class="raw">'+esc(c.desc||'')+(c.extra?'<br><span class="note">补充：'+esc(c.extra)+'</span>':'')+(c.refund?'<br><span class="chip plain c-bad">涉及退费</span>':'')+'</div></div>'+
+  (c.status!=='to_notify'&&items.length?'<div><div class="sec-t">认定与处罚</div>'+items.map(i=>'<div class="cpl-res"><b>'+esc(i.type)+'</b><span class="chip plain '+(i.n>1?'c-bad':'c-mute')+'">第 '+i.n+' 次</span><span>'+esc(i.penalty||'—')+'</span></div>').join('')+'</div>':'')+
+  act+
+  '<div><div class="sec-t">处理记录</div><div class="timeline">'+[...(c.events||[])].map(e=>'<div class="ev"><div class="when">'+fmtT(e.at)+(e.by?' · '+esc(who(e.by)):'')+'</div><div class="what">'+esc(e.text)+'</div></div>').join('')+'</div></div>'+
+  (c.coachId||c.coachName?'<div class="actions"><button class="btn sm" data-coach-open="1">查看教练档案 →</button></div>':'')+'</div>';
+}
+function bindCpl(id){
+  const c=Store.get('complaints',id);if(!c)return;const D=$('#drawer');
+  const save=async(patch,msg)=>{if(await safe(()=>Store.update('complaints',id,patch))){if(msg)toast(msg);refreshDrawer(true)}};
+  const setTypes=(types,over)=>save({types,over:over||c.over||{}});
+  D.querySelectorAll('[data-it-type]').forEach(s=>s.onchange=()=>{const t=[...(c.types||[])];const old=t[+s.dataset.itType];t[+s.dataset.itType]=s.value;const ov=Object.assign({},c.over||{});delete ov[old];setTypes(t,ov)});
+  D.querySelectorAll('[data-it-pen]').forEach(i=>i.onchange=()=>{const t=(c.types||[])[+i.dataset.itPen];const ov=Object.assign({},c.over||{});ov[t]=i.value.trim();setTypes(c.types,ov)});
+  D.querySelectorAll('[data-it-del]').forEach(b=>b.onclick=()=>{const t=[...(c.types||[])];const [rm]=t.splice(+b.dataset.itDel,1);const ov=Object.assign({},c.over||{});delete ov[rm];setTypes(t,ov)});
+  const add=$('#cpl-add');if(add)add.onchange=()=>{if(add.value&&!(c.types||[]).includes(add.value))setTypes([...(c.types||[]),add.value])};
+  D.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>save({status:'closed',closeReason:b.dataset.close,decidedAt:Date.now(),events:[...(c.events||[]),cplEv('核实后关闭：'+b.dataset.close)]},'已关闭'));
+  const cd=$('#cpl-cdesc');if(cd)cd.onchange=()=>save({coachDesc:cd.value.trim()},'通知文字已更新');
+  const cp=D.querySelector('[data-coach-open]');if(cp)cp.onclick=()=>{const k=coachKey(c);go('coaches');openDrawer('coach',k)};
+  D.querySelectorAll('[data-ca]').forEach(b=>b.onclick=async()=>{const a=b.dataset.ca,now=Date.now(),items=cplShow(c);
+    if(a==='copy')return copy(cplNotice([c]),'通知已复制，可以粘贴到企业微信发送');
+    if(a==='copyfb')return copy(cplFbText(c),'反馈话术已复制，可以发给'+cplWho(c));
+    if(a==='copyack')return copy(cplAckText(c),'受理反馈已复制');
+    if(a==='copyresult')return copy(cplResultText(c),'处理结果通知已复制');
+    if(a==='remind')return copy(cplRemindText(c),'提醒话术已复制');
+    if(a==='fbdone')return save({fbDoneAt:now,events:[...(c.events||[]),cplEv('已把处理结果反馈给'+cplWho(c))]},'已标记反馈');
+    if(a==='ackdone')return save({fbAckAt:now,events:[...(c.events||[]),cplEv('已给'+cplWho(c)+'发送受理反馈')]},'已标记');
+    if(a==='copyrevoke')return copy(cplRevokeText(c),'撤销通知已复制');
+    if(a==='sent')return save({status:'notified',notifiedAt:now,notice:cplNotice([c]),items,events:[...(c.events||[]),cplEv('已发送投诉情况确认通知：'+items.map(i=>i.type+'（第'+i.n+'次）').join('、'))]},'已标记为已通知');
+    const reply=($('#cpl-reply')||{}).value||'',review=($('#cpl-review')||{}).value||'';
+    const confirm=async(txt)=>{await save({status:'confirmed',final:items,decidedAt:now,coachReply:reply||c.coachReply||'',events:[...(c.events||[]),cplEv(txt+(reply?'：'+reply.slice(0,80):''))]},'已确认属实，请把处理结果反馈给'+cplWho(c));cplAfterConfirm(c)};
+    if(a==='accept')return confirm('教练认可，确认属实');
+    if(a==='timeout')return confirm((+CPEN().replyHours||48)+' 小时内未申诉，确认属实');
+    if(a==='appeal')return save({status:'appeal',appealNote:reply.trim(),events:[...(c.events||[]),cplEv('教练申诉'+(reply?'：'+reply.slice(0,80):''))]},'已进入申诉审核');
+    if(a==='keep'){await save({status:'confirmed',final:items,decidedAt:now,reviewNote:review,events:[...(c.events||[]),cplEv('申诉不成立，确认属实'+(review?'：'+review.slice(0,80):''))]},'已确认属实，请把处理结果反馈给'+cplWho(c));return cplAfterConfirm(c)}
+    if(a==='revoke')return save({status:'revoked',decidedAt:now,reviewNote:review,events:[...(c.events||[]),cplEv('申诉成立 / 撤销处罚'+(review?'：'+review.slice(0,80):''))]},'已撤销，不做处理');
+    if(a==='reopen')return save({status:'to_notify',closeReason:'',events:[...(c.events||[]),cplEv('重新打开')]},'已重新打开');
+  });
+}
+/* 属实后：如果投诉之后该教练还没有质检、也没有进行中的任务，再派一次质检 */
+async function cplAfterConfirm(c){
+  const cfg=DISP();if(!cfg.enabled||!cfg.rules.complaint.on)return;const k=coachKey(c),since=c.reportedAt?dstr(new Date(c.reportedAt)):'';
+  if(Store.all('tasks').some(t=>taskOpen(t)&&coachKey(t)===k))return;
+  if(Store.all('qc').some(r=>coachKey(r)===k&&(r.date||'')>=since))return;
+  await autoTaskForCpl(c,'投诉属实复查');
+}
+async function autoTaskForCpl(c,note){
+  const cfg=DISP();if(!cfg.enabled||!cfg.rules.complaint.on)return false;
+  if(Store.all('tasks').some(t=>taskOpen(t)&&coachKey(t)===coachKey(c)))return false;
+  const dt=today(),pool=inspectorPool(cfg,dt),std=stdForCoach(c.coachId),asg=pool.length?pickInspector(pool,std,true):null;
+  const t=taskDoc({reason:'complaint',coachId:c.coachId||'',coachName:c.coachName,std,cplId:c.id,src:'complaint',note:(note?note+' · ':'')+(c.types||[]).join('、')+' · '+(c.desc||'').slice(0,30),assigneeId:asg?asg.id:'',assigneeName:asg&&!asg.id?asg.name:'',reasonText:REASON.complaint[0]},dt,cfg,true);t.id=uid('RW');
+  return await safe(()=>Store.set('tasks',t.id,t));
+}
+
+/* ---------- 导入 ---------- */
+const CFF=[['reportedAt','投诉日期',true,['填写时间','投诉时间','投诉日期','反馈时间','提交时间','日期']],['reporter','提交人',false,['填写人','投诉人','提交人','反馈人']],['dept','所在部门',false,['所在部门','部门','小组']],
+ ['lessonType','授课类型',false,['被投诉教练授课类型','授课类型','课型']],['coachName','教练姓名',false,['被投诉教练姓名','教练姓名','老师姓名','教练']],['coachId','教练 ID',true,['被投诉教练id','教练id','业务系统编号','老师id','教练编号']],
+ ['student','学员 ID',false,['学员id','学生id','用户id']],['lessonTime','上课时间',false,['上课时间','课程时间','上课日期']],['probType','问题类型',false,['问题类型','问题类型原','投诉类型','违规类型']],
+ ['desc','违规问题描述',true,['违规问题描述','问题描述','投诉内容','违规描述','描述']],['extra','其他补充',false,['其他补充','补充说明','备注']],['src','投诉来源',false,['投诉来源','来源','投诉渠道']],
+ ['refund','涉及退费',false,['涉及退费','是否退费']],['verdict','是否属实（历史）',false,['是否属实','核实结果']],['result','处理结果（历史）',false,['处理结果','处罚结果','处理方式']]];
+function cimpSetSheet(n){CIMP.sheet=n;CIMP.rows=aoa(CIMP.X,CIMP.wb.Sheets[n]);cimpSetHeader(guessHeader(CIMP.rows,CFF))}
+function cimpSetHeader(h){CIMP.headerRow=h;CIMP.hdr=(CIMP.rows[h]||[]).map(cellStr);CIMP.map=guessMap(CIMP.rows[h]||[],CFF)}
+function cplTimeStr(v){if(v instanceof Date&&!isNaN(v))return dstr(v)+' '+pad(v.getHours())+':'+pad(v.getMinutes());const t=cellStr(v);if(/^\d{5}(\.\d+)?$/.test(t)){const d=new Date(Math.round((+t-25569)*864e5));const s=d.toISOString();return s.slice(0,10)+(+t%1?' '+s.slice(11,16):'')}return t.slice(0,19)}
+function cimpParse(){
+  const g=(row,k)=>CIMP.map[k]==null?'':row[CIMP.map[k]],ex=new Set(Store.all('complaints').map(c=>c.key)),out=[],invalid=[],unmatched={};let dup=0,hist=0,histOk=0;
+  for(let i=CIMP.headerRow+1;i<CIMP.rows.length;i++){const row=CIMP.rows[i];if(!row.some(v=>cellStr(v)))continue;
+    const coachId=cellStr(g(row,'coachId')),desc=cellStr(g(row,'desc')),rv=g(row,'reportedAt');const rd=normDate(rv);
+    if(!coachId||!desc){invalid.push(i+1);continue}
+    let at=rv instanceof Date?rv.getTime():isDate(rd)?new Date(rd+'T12:00:00').getTime():Date.now();
+    const src=cplSrcNorm(g(row,'src'));const student=cellStr(g(row,'student'));
+    const key=[coachId,student,isDate(rd)?rd:'',desc.slice(0,24)].join('|');
+    if(ex.has(key)||out.some(o=>o.key===key)){dup++;continue}
+    const probType=cellStr(g(row,'probType'));const types=cplMatch(probType,desc);
+    if(!types.length)unmatched[probType||'（空）']=(unmatched[probType||'（空）']||0)+1;
+    const verdict=cellStr(g(row,'verdict'));
+    const it={key,reportedAt:at,reporter:cellStr(g(row,'reporter')),dept:cellStr(g(row,'dept')),lessonType:cellStr(g(row,'lessonType')),coachName:cellStr(g(row,'coachName'))||((ROSTER.get(coachId)||{}).name||''),coachId,student,lessonTime:cplTimeStr(g(row,'lessonTime')),probType,desc:desc.slice(0,1200),extra:cellStr(g(row,'extra')).slice(0,400),src:src.length?src:(CIMP.defSrc?[CIMP.defSrc]:[]),refund:!!cellStr(g(row,'refund'))&&!/^(否|无|no)$/i.test(cellStr(g(row,'refund'))),types,verdict,result:cellStr(g(row,'result')).slice(0,200)};
+    if(verdict){hist++;if(verdict==='属实')histOk++}
+    out.push(it)}
+  return {out,invalid,dup,hist,histOk,unmatched};
+}
+function renderCplImport(box){
+  const admin=!Store.readOnly;
+  if(!CIMP||!CIMP.stage){
+    box.innerHTML='<div class="panel"><div class="p-label">导入投诉 <button class="btn sm" id="cpl-tpl">下载导入模板</button></div>'+(admin?'<label class="drop" for="cpl-file" style="cursor:pointer"><span class="big">选择投诉表 Excel 或 CSV</span><span>可以直接用「LE/LC 投诉渠道」原表。需要教练 ID 和违规问题描述；投诉来源、问题类型、上课时间、学员 ID 有就带上。表里有「是否属实」列的行会作为历史记录导入（属实的计入违规次数，不再发通知）。学生姓名、截图等列不会导入。</span><span class="btn primary">选择文件</span></label><input type="file" id="cpl-file" accept=".xlsx,.xls,.csv" hidden><p class="note" id="cpl-msg" style="margin:10px 0 0"></p>':'<div class="banner info"><div>只读账号不能导入。</div></div>')+'</div>';
+    $('#cpl-tpl').onclick=()=>saveFile('投诉导入模板.csv','﻿填写时间,填写人,所在部门,授课类型,教练姓名,教练ID,学员ID,上课时间,问题类型,违规问题描述,其他补充,投诉来源,涉及退费\n2026-10-20,示例辅导,示例小组,正课,示例教练,6500001,60000001,2026-10-19 19:00,迟到,教练迟到 10 分钟进入教室，未提前告知,,辅导投诉,\n');
+    const f=$('#cpl-file');if(f)f.onchange=async()=>{const file=f.files[0];if(!file)return;$('#cpl-msg').textContent='正在读取 '+file.name+' …';
+      try{const wb=await readBook(file);CIMP={file:file.name,wb,X:window.XLSX,stage:'map',defSrc:''};cimpSetSheet(wb.SheetNames[0]);renderComplaints()}catch(e){$('#cpl-msg').textContent='读取失败：'+(e.message||'文件格式不支持');f.value=''}};
+    return;
+  }
+  const P=cimpParse(),opts=i=>'<option value="">（不导入）</option>'+CIMP.hdr.map((h,ci)=>h?'<option value="'+ci+'"'+(i===ci?' selected':'')+'>'+esc(h)+'</option>':'').join('');
+  const miss=CFF.filter(f=>f[2]&&CIMP.map[f[0]]==null).map(f=>f[1]);const newN=P.out.filter(x=>!x.verdict).length;
+  const um=Object.entries(P.unmatched).sort((a,b)=>b[1]-a[1]);
+  box.innerHTML='<div class="panel"><div class="p-label">'+esc(CIMP.file)+' <button class="btn sm" id="ci-cancel">取消导入</button></div><div class="form-grid">'+(CIMP.wb.SheetNames.length>1?fld('工作表','<select class="inp" id="ci-sheet">'+CIMP.wb.SheetNames.map(n=>'<option'+(n===CIMP.sheet?' selected':'')+'>'+esc(n)+'</option>').join('')+'</select>'):'')+fld('表头在第几行',inp('ci-hdr',String(CIMP.headerRow+1),'number','',' min="1"'))+fld('表里没有来源时默认',sel('ci-def',CPL_SRC,CIMP.defSrc,'不填'))+'</div></div>'+
+   '<div class="panel"><div class="p-label">列对应 <b>已自动识别，可手动调整</b></div><div class="tbl-wrap"><table><thead><tr><th>系统字段</th><th>你的表头</th><th>示例</th></tr></thead><tbody>'+CFF.map(([k,t,req])=>{const ci=CIMP.map[k];return '<tr><td><b>'+t+'</b> '+(req?'<span class="chip c-bad plain" style="font-size:10px;padding:1px 6px">必填</span>':'')+'</td><td><select class="inp" data-cmap="'+k+'">'+opts(ci)+'</select></td><td class="note" style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(ci==null?'':cellStr((CIMP.rows[CIMP.headerRow+1]||[])[ci]).slice(0,60))+'</td></tr>'}).join('')+'</tbody></table></div></div>'+
+   '<div class="panel"><div class="p-label">预览</div><div class="vstats"><div class="vstat"><div class="num">'+newN+'</div><div class="lab">新投诉 · 导入后生成通知</div></div><div class="vstat"><div class="num">'+P.hist+'</div><div class="lab">历史记录 · 属实 '+P.histOk+'</div></div><div class="vstat"><div class="num">'+P.dup+'</div><div class="lab">已导入过，跳过</div></div><div class="vstat"><div class="num">'+P.invalid.length+'</div><div class="lab">缺教练 ID 或描述</div></div></div>'+
+   (um.length?'<div class="banner warn" style="margin-top:12px"><div>'+um.reduce((s,x)=>s+x[1],0)+' 条的问题类型没有对应到处罚规则：'+um.slice(0,8).map(([t,n])=>esc(t)+' ×'+n).join('、')+'。导入后在每条投诉里手动选择违规类型，或先到「处罚规则」给对应类型加关键词。</div></div>':'')+
+   (DISP().enabled&&DISP().rules.complaint.on?'<p class="note" style="margin:10px 0 0">自动派发已开启：新投诉导入后会给被投诉教练各派一节质检（已有进行中任务的教练不重复派）。</p>':'')+
+   '<div class="row-actions" style="margin-top:14px">'+(miss.length?'<span class="errs">请对应：'+miss.join('、')+'</span>':'')+'<button class="btn primary" id="ci-go"'+(miss.length||!P.out.length?' disabled':'')+'>确认导入 '+P.out.length+' 条</button></div></div>';
+  $('#ci-cancel').onclick=()=>{CIMP=null;renderComplaints()};
+  const sh=$('#ci-sheet');if(sh)sh.onchange=()=>{cimpSetSheet(sh.value);renderComplaints._force=true;renderComplaints()};
+  const ih=$('#ci-hdr');ih.oninput=()=>{clearTimeout(ih._t);ih._t=setTimeout(()=>{cimpSetHeader(Math.min(Math.max(1,parseInt(ih.value)||1)-1,CIMP.rows.length-1));renderComplaints._force=true;renderComplaints()},600)};
+  $('#ci-def').onchange=e=>{CIMP.defSrc=e.target.value;renderComplaints._force=true;renderComplaints()};
+  box.querySelectorAll('[data-cmap]').forEach(s=>s.onchange=()=>{const k=s.dataset.cmap,v=s.value===''?null:+s.value;Object.keys(CIMP.map).forEach(x=>{if(CIMP.map[x]===v)delete CIMP.map[x]});if(v==null)delete CIMP.map[k];else CIMP.map[k]=v;renderComplaints._force=true;renderComplaints()});
+  $('#ci-go').onclick=async()=>{const b=$('#ci-go');b.disabled=true;b.textContent='正在导入…';const Q=cimpParse(),now=Date.now();let n=0,tasks=0;
+    const ok=await safe(async()=>{
+      const sent=new Set();let i=0;
+      for(const x of Q.out){const id=uid('TS')+String(i++).padStart(3,'0').slice(-2);const hist=!!x.verdict;if(i%15===0)b.textContent='正在导入 '+i+' / '+Q.out.length+' …';
+        const st=!hist?'to_notify':x.verdict==='属实'?'confirmed':x.verdict==='撤销投诉'||x.verdict==='申诉成功'?'revoked':'closed';
+        const doc=Object.assign({},x,{id,status:st,history:hist,createdAt:now,createdBy:meId(),closeReason:st==='closed'?x.verdict:'',events:[cplEv('导入：'+CIMP.file+(hist?'（历史记录：'+x.verdict+(x.result?'，'+x.result:'')+'）':''))]});
+        if(hist&&st==='confirmed'){doc.decidedAt=x.reportedAt;doc.final=(x.types||[]).map(t=>({type:t,n:1,clause:'',penalty:x.result||''}))}
+        await Store.set('complaints',id,doc);n++;
+        if(!hist&&!sent.has(coachKey(doc))){sent.add(coachKey(doc));if(await autoTaskForCpl(doc,'投诉导入'))tasks++}}
+      await Store.set('imports',uid('IM'),{kind:'complaint',at:now,by:meId(),file:CIMP.file,rows:n,added:n,updated:0,same:Q.dup,invalid:Q.invalid.length});
+    });
+    if(ok){toast('已导入 '+n+' 条投诉'+(tasks?'，派发质检 '+tasks+' 条':''));CIMP=null;cplTab='list';cplF.st='to_notify';renderComplaints()}else{b.disabled=false;b.textContent='确认导入'}};
+}
+
+/* ---------- 处罚规则（管理员） ---------- */
+let penEdit=null;
+function renderCplRules(box){
+  const P=CPEN(),admin=IS_ADMIN&&!Store.readOnly;
+  if(!penEdit)penEdit=JSON.parse(JSON.stringify(P));
+  const E=penEdit;
+  box.innerHTML='<div class="panel"><div class="p-label">处罚规则 <b>导入投诉时按违规类型和该教练此前属实次数自动带出处罚</b>'+(admin?'<span class="actions"><label class="btn sm" for="pen-file" style="cursor:pointer">导入规则 Excel</label><input type="file" id="pen-file" accept=".xlsx,.xls,.csv" hidden><button class="btn sm" id="pen-tpl">下载模板</button></span>':'')+'</div>'+
+   '<div class="form-grid">'+fld('通知中引用的制度名称','<input class="inp" id="pen-policy" value="'+esc(E.policy)+'"'+(admin?'':' disabled')+'>')+fld('教练回复时限（小时）','<input class="inp" type="number" min="1" id="pen-hours" value="'+esc(E.replyHours)+'"'+(admin?'':' disabled')+'>')+fld('高风险：近 N 天','<input class="inp" type="number" min="1" id="pen-rdays" value="'+esc(E.riskDays)+'"'+(admin?'':' disabled')+'>')+fld('属实投诉 ≥ 条','<input class="inp" type="number" min="1" id="pen-rn" value="'+esc(E.riskN)+'"'+(admin?'':' disabled')+'>')+'</div>'+
+   '<div class="tbl-wrap" style="margin-top:12px"><table class="pen-tbl"><thead><tr><th>违规类型</th><th>制度条款</th><th>首次</th><th>第 2 次</th><th>第 3 次</th><th>匹配关键词（逗号分隔）</th>'+(admin?'<th></th>':'')+'</tr></thead><tbody>'+
+   (E.rules.length?E.rules.map((r,i)=>'<tr><td><input class="inp" data-r="'+i+'" data-f="type" value="'+esc(r.type)+'"'+(admin?'':' disabled')+'></td><td><input class="inp" data-r="'+i+'" data-f="clause" value="'+esc(r.clause||'')+'"'+(admin?'':' disabled')+'></td>'+[0,1,2].map(j=>'<td><textarea class="inp" rows="2" data-r="'+i+'" data-p="'+j+'"'+(admin?'':' disabled')+'>'+esc((r.p||[])[j]||'')+'</textarea></td>').join('')+'<td><input class="inp" data-r="'+i+'" data-f="kw" value="'+esc((r.kw||[]).join('，'))+'"'+(admin?'':' disabled')+'></td>'+(admin?'<td><button class="btn sm" data-rdel="'+i+'">✕</button></td>':'')+'</tr>').join(''):'<tr><td colspan="7" class="note" style="text-align:center;padding:18px">还没有规则。可以导入规则 Excel，或点下面「添加一行」。</td></tr>')+
+   '</tbody></table></div>'+(admin?'<div class="row-actions" style="margin-top:12px;justify-content:space-between"><button class="btn sm" id="pen-add">＋ 添加一行</button><span class="actions"><button class="btn" id="pen-reset">放弃修改</button><button class="btn primary" id="pen-save">保存规则</button></span></div>':'<p class="note">只有管理员可以修改处罚规则。</p>')+
+   '<p class="note" style="margin:10px 0 0">次数按同一教练、同一违规类型此前「属实」的投诉计算（不同类型不累计）。某一次填「—」或留空时，沿用上一档；填「同首次」则每次都按首次执行。</p></div>';
+  if(!admin)return;
+  box.querySelectorAll('[data-r]').forEach(x=>x.oninput=()=>{const r=E.rules[+x.dataset.r];if(x.dataset.p!=null){r.p=r.p||['','',''];r.p[+x.dataset.p]=x.value}else if(x.dataset.f==='kw')r.kw=x.value.split(/[,，、\s]+/).filter(Boolean);else r[x.dataset.f]=x.value});
+  box.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{E.rules.splice(+b.dataset.rdel,1);renderCplRules(box)});
+  $('#pen-add').onclick=()=>{E.rules.push({type:'',clause:'',p:['','',''],kw:[]});renderCplRules(box)};
+  $('#pen-reset').onclick=()=>{penEdit=null;renderCplRules(box)};
+  ['policy','hours','rdays','rn'].forEach(k=>$('#pen-'+k).oninput=e=>{const v=e.target.value;if(k==='policy')E.policy=v;if(k==='hours')E.replyHours=Math.max(1,+v||48);if(k==='rdays')E.riskDays=Math.max(1,+v||90);if(k==='rn')E.riskN=Math.max(1,+v||2)});
+  $('#pen-save').onclick=async()=>{const rules=E.rules.filter(r=>cellStr(r.type)).map(r=>({type:cellStr(r.type),clause:cellStr(r.clause),p:(r.p||[]).map(cellStr),kw:(r.kw||[]).map(cellStr).filter(Boolean)}));
+    if(await safe(()=>Store.set('config','penalty',{data:{policy:cellStr(E.policy)||CPEN0.policy,replyHours:+E.replyHours||48,riskDays:+E.riskDays||90,riskN:+E.riskN||2,rules},savedAt:Date.now(),by:meId()}))){penEdit=null;toast('处罚规则已保存');renderComplaints()}};
+  $('#pen-tpl').onclick=()=>saveFile('处罚规则模板.csv','﻿违规类型,制度条款,首次,第2次,第3次,关键词\n迟到,第三章考勤管理第1条,扣除5元，需给用户双倍补足课时,扣除5元，暂停排课,扣除5元，标记离职并解除合作,迟到\n');
+  $('#pen-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const wb=await readBook(file);const rows=aoa(window.XLSX,wb.Sheets[wb.SheetNames[0]]);
+    let h=rows.findIndex(r=>r.map(cellStr).some(v=>/违规类型/.test(v)));if(h<0)throw new Error('没有找到「违规类型」表头');const H2=rows[h].map(cellStr);const ix=re=>H2.findIndex(v=>re.test(v));
+    const it=ix(/违规类型/),ic=ix(/条款/),i1=ix(/首次|第\s*1\s*次/),i2=ix(/第\s*2\s*次|第二次/),i3=ix(/第\s*3\s*次|第三次/),ik=ix(/关键词/);
+    const rules=rows.slice(h+1).filter(r=>cellStr(r[it])).map(r=>({type:cellStr(r[it]),clause:ic>=0?cellStr(r[ic]):'',p:[i1,i2,i3].map(j=>j>=0?cellStr(r[j]):''),kw:ik>=0?cellStr(r[ik]).split(/[,，、\s]+/).filter(Boolean):[]}));
+    if(!rules.length)throw new Error('没有读到规则');E.rules=rules;toast('已读入 '+rules.length+' 条规则，确认后点「保存规则」');renderCplRules(box)}catch(err){toast('读取失败：'+(err.message||''))}};
+}
+/* 教练档案里的投诉记录 */
+function cplSection(a){
+  const list=Store.all('complaints').filter(c=>coachKey(c)===a.key).sort((x,y)=>(y.reportedAt||0)-(x.reportedAt||0));
+  if(!list.length)return '';
+  const ok=list.filter(c=>c.status==='confirmed'),byT={};ok.forEach(c=>cplShow(c).forEach(i=>byT[i.type]=(byT[i.type]||0)+1));
+  return '<div><div class="sec-t">投诉 · '+list.length+'（属实 '+ok.length+'）</div>'+(Object.keys(byT).length?'<div class="trs" style="margin-bottom:8px">'+Object.entries(byT).map(([t,n])=>'<span class="tr-chip req"><b>'+esc(t)+'</b>'+n+' 次</span>').join('')+'</div>':'')+
+   list.slice(0,10).map(c=>'<button class="alert-item" data-cpl="'+c.id+'"><span class="t">'+esc(cplShow(c).map(i=>i.type).join('、')||c.probType||'投诉')+' · '+esc(cplSrcText(c))+'</span><span class="m"><span>'+(c.reportedAt?dstr(new Date(c.reportedAt)):'')+' · '+esc((cplShow(c).map(i=>i.penalty).filter(Boolean).join('；')||'').slice(0,26))+'</span><span>'+CPL_ST[c.status].t+'</span></span></button>').join('')+(list.length>10?'<p class="note">只显示最近 10 条</p>':'')+'</div>';
+}
+function cplRisk(a){const P=CPEN(),from=Date.now()-(+P.riskDays||90)*864e5;return Store.all('complaints').filter(c=>c.status==='confirmed'&&coachKey(c)===a.key&&(c.decidedAt||c.reportedAt||0)>=from).length}
+
+/* =====================================================================
    SETTINGS — 设置入口集中页
    ===================================================================== */
 function renderSettings(){
@@ -1679,6 +2015,7 @@ function renderSettings(){
     ['std','质检标准库','体验课 / 正课评分标准，在线编辑或上传新版 Excel，按版本保存。',ad?'管理员可编辑':'只读'],
     ['disp','自动派发设置','派发规则、每日上限、质检专员名单，开启每日自动派发。',ad?'管理员可编辑':'只读'],
     ['tags','教练画像标签','教学风格、发音、软性素质、教学技能、质检违规等下拉选项。',ad?'管理员可编辑':'只读'],
+    ['penalty','投诉处罚规则','违规类型对应的首次 / 第 2 次 / 第 3 次处罚、匹配关键词、教练回复时限。',ad?'管理员可编辑':'只读'],
     ['refund','高退费判定','统计天数、单数门槛，以及计入体验课 / 正课哪类教练。',ad?'管理员可编辑':'只读'],
     ['roster','数据导入','教练信息、退费明细；之后的课表、订单、开放时段也在这里导入。',ad?'管理员':'只读'],
   ].concat(sb?[['members','成员权限','给同事分配管理员 / 质检专员 / 只读，审核新注册账号。',ad?'管理员':'仅管理员']]:[]).concat([
@@ -1689,7 +2026,7 @@ function renderSettings(){
    '<div class="panel set-card set-static"><span class="set-t">外观</span><span class="set-d">日间 / 夜间主题，默认跟随电脑设置。</span><span class="actions" style="margin-top:6px"><button class="btn sm" data-theme-set="light">日间</button><button class="btn sm" data-theme-set="dark">夜间</button><button class="btn sm" data-theme-set="">跟随系统</button></span></div></div>';
   el.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>{const k=b.dataset.set;
     if(k==='std')go('qc',{tab:'library'});else if(k==='disp'){tkTab='settings';go('tasks')}else if(k==='tags'){go('coaches');openDrawer('tagcfg','x')}
-    else if(k==='refund'){impTab='refund';go('import')}else if(k==='roster'){impTab='roster';go('import')}else if(k==='members'){impTab='members';go('import')}else if(k==='arch')go('arch')});
+    else if(k==='refund'){impTab='refund';go('import')}else if(k==='roster'){impTab='roster';go('import')}else if(k==='members'){impTab='members';go('import')}else if(k==='arch')go('arch');else if(k==='penalty'){cplTab='rules';go('complaints')}});
   el.querySelectorAll('[data-theme-set]').forEach(b=>b.onclick=()=>{const v=b.dataset.themeSet,r=document.documentElement;if(v)r.dataset.theme=v;else delete r.dataset.theme;lsSet('qc-theme',v)});
 }
 function ovTasks(){
@@ -2170,7 +2507,7 @@ function bindTr(id){
 function renderNotices(){
   const el=$('#v-notices');if(!Store.ready()){el.innerHTML=loadingHtml;return}
   const cs=Store.all('cases'),pend=cs.filter(c=>c.status==='pending_notice'),wait=cs.filter(c=>['notified','appealing'].includes(c.status));
-  el.innerHTML='<div class="v-head"><div><div class="eyebrow"><span class="dot"></span>06 · Notices</div><h1>通知中心</h1><p>判定属实的工单会自动生成【质检违纪通知】话术。复制后通过你们平时的渠道发给教练，发完回来点「标记已通知」；教练确认或申诉的结果也在这里录入。</p></div></div>'+
+  el.innerHTML='<div class="v-head"><div><div class="eyebrow"><span class="dot"></span>06 · Notices</div><h1>通知中心</h1><p>判定属实的工单会自动生成【质检违纪通知】话术。复制后通过你们平时的渠道发给教练，发完回来点「标记已通知」；教练确认或申诉的结果也在这里录入。</p></div></div>'+(()=>{const n=Store.all('complaints').filter(c=>c.status==='to_notify').length;return n?'<div class="banner warn"><div>投诉管理里有 <b>'+n+'</b> 条投诉情况确认通知待发送。<button class="link" data-goto="complaints">去投诉管理 →</button></div></div>':''})()+
   '<div class="p-label" style="margin:0">待发送 <b>'+pend.length+' 条</b></div><div style="display:flex;flex-direction:column;gap:14px">'+(pend.length?pend.map(c=>'<div class="panel notice-card"><div class="notice-head"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="mono" style="font-size:12px">'+c.id+'</span><span class="src">'+(SRC[c.src]||'')+'</span><span class="chip c-bad plain">'+esc(c.violation)+'</span><span class="chip c-warn plain">'+esc(c.penalty)+'</span></div><span class="sla '+sla(c).cls+'">'+sla(c).txt+'</span></div><div class="notice-text">'+noticeText(c,true)+'</div><div class="row-actions"><button class="btn sm" data-case="'+c.id+'">查看工单</button><button class="btn sm" data-copy="'+c.id+'">复制话术</button><button class="btn sm primary" data-mark="'+c.id+'"'+(Store.readOnly?' disabled':'')+'>我已发送，标记已通知</button></div></div>').join(''):'<div class="panel"><div class="empty">没有待发送的通知。工单判定属实后会出现在这里。</div></div>')+'</div>'+
   '<div class="panel"><div class="p-label">已通知，等待教练回复</div><div class="tbl-wrap"><table><thead><tr><th>工单</th><th>教练</th><th>处罚</th><th>通知时间</th><th>状态</th><th>录入结果</th></tr></thead><tbody>'+(wait.length?wait.map(c=>'<tr><td class="mono" style="font-size:12px">'+c.id+'</td><td>'+esc(c.coachName||'')+'</td><td>'+esc(c.penalty||'')+'</td><td class="mono" style="font-size:12px">'+(c.noticedAt?fmtT(c.noticedAt):'—')+'</td><td>'+chip(c.status)+'</td><td><div class="actions">'+(c.status==='notified'?'<button class="btn sm ok" data-res="'+c.id+'|archived"'+(Store.readOnly?' disabled':'')+'>已确认</button><button class="btn sm bad" data-res="'+c.id+'|appealing"'+(Store.readOnly?' disabled':'')+'>申诉</button>':'<button class="btn sm" data-case="'+c.id+'">处理申诉</button>')+'</div></td></tr>').join(''):'<tr><td colspan="6" class="note" style="text-align:center;padding:20px">暂无</td></tr>')+'</tbody></table></div></div>'+
   '<div class="panel"><div class="p-label">话术模板 <b>变量会自动替换</b></div><div class="notice-text">'+noticeText({},true)+'</div></div>';
@@ -2231,7 +2568,8 @@ function coachAgg(){
     a.active=a.ro?isActive(a.ro):true;
     const lastLv=last?last.result.level:'';
     a.refund=a.id?refundOf(a.id):null;
-    a.risk=(a.red||a.subst>=2||lastLv==='不合格'||a.overTr||(a.refund&&a.refund.high))?'high':(lastLv==='合格'||a.subst===1||a.openTr.length)?'mid':'low';
+    a.cpl=a.id||a.name?cplRisk(a):0;
+    a.risk=(a.red||a.subst>=2||lastLv==='不合格'||a.overTr||(a.refund&&a.refund.high)||a.cpl>=(+CPEN().riskN||2))?'high':(lastLv==='合格'||a.subst===1||a.openTr.length)?'mid':'low';
     a.score=(a.risk==='high'?100:a.risk==='mid'?50:0)+a.red*10+a.subst*5+(a.qc.length?1:0)+(a.tg?.5:0)-(a.avg||0)/1000;
     const fc={};a.qc.forEach(r=>{(R(r).failList||[]).forEach(p=>{fc[p.c+'|'+r.std]=(fc[p.c+'|'+r.std]||{n:0,p});fc[p.c+'|'+r.std].n++})});
     a.top=Object.entries(fc).sort((x,y)=>y[1].n-x[1].n).slice(0,5).map(([k,v])=>{const [c,st]=k.split('|');return {c,s:st,n:v.n,p:v.p}});
@@ -2328,7 +2666,7 @@ function drawCoach(key){
   '<div class="d-body">'+(ro?'<div class="kv"><div><span>教练标签</span><b>'+esc(ro.tag||ro.type||'—')+'</b></div><div><span>教练等级</span><b>'+esc(ro.level||'—')+'</b></div><div><span>教练团队</span><b>'+esc(ro.team||'—')+'</b></div><div><span>基地 · 组别</span><b>'+esc([ro.base,ro.group].filter(Boolean).join(' · ')||'—')+(ro.leader?'（组长 '+esc(ro.leader)+'）':'')+'</b></div><div><span>企微名称</span><b>'+esc(ro.wecom||'—')+'</b></div><div><span>入职日期</span><b>'+esc(ro.joinDate||'—')+'</b></div>'+(ro.leaveDate?'<div><span>离职日期</span><b>'+esc(ro.leaveDate)+'</b></div>':'')+ex.map(([k,v])=>'<div><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>').join('')+'</div>'+
     ((lineOf(ro)!=='正课')&&!ro.team&&!ro.base?'<div class="banner warn"><div>体验课教练还没有填教练团队、基地'+(canOrg?'，可以点「编辑组织信息」补充，或在导入时带上这些列':'')+'。</div></div>':'')+
     (orgEd?orgForm(a):(canOrg?'<div><button class="btn sm" id="og-open">编辑组织信息</button></div>':'')):'<div class="banner warn"><div>这位教练不在教练名单里，信息来自质检记录或工单。</div></div>')+
-  refundSection(a,canTag)+
+  refundSection(a,canTag)+cplSection(a)+
   '<div><div class="sec-t" style="justify-content:space-between">教练画像'+(canTag&&!editing?' <button class="btn sm" id="tg-open">'+(tagged(a.tg)?'编辑标签':'打标签')+'</button>':'')+'</div>'+(editing?tagsForm(a,T):tagsView(a.tg,T))+'</div>'+
   '<div class="kv"><div><span>质检次数</span><b>'+a.qc.length+'</b></div><div><span>平均分</span><b>'+(a.avg==null?'—':a.avg)+'</b></div><div><span>红线课</span><b>'+a.red+'</b></div><div><span>工单 · 属实</span><b>'+a.cases.length+' · '+a.subst+'</b></div></div>'+
   (a.nums.length>1?'<div><div class="sec-t">得分趋势</div><div style="height:46px">'+spark(a.nums,'var(--amber-l)').replace('<svg','<svg style="width:100%;height:46px"')+'</div></div>':'')+
@@ -2423,6 +2761,7 @@ function genCandidates(dateStr,cfg){
   const lastQc={};Store.all('qc').forEach(r=>{const k=coachKey(r);if(!lastQc[k]||r.date>lastQc[k])lastQc[k]=r.date});
   if(R_.recheck.on)Store.all('training').filter(t=>trOpen(t)&&isDate(t.due)&&daysLeft(t.due)<=+R_.recheck.lead).sort((a,b)=>a.due<b.due?-1:1).forEach(t=>{if(tasks.some(x=>x.trainingId===t.id&&x.status!=='cancelled'))return;add('recheck',t,{std:t.std,trainingId:t.id,note:'复检截止 '+t.due})});
   if(R_.complaint.on){const from=Date.now()-(+R_.complaint.window)*864e5;Store.all('cases').filter(c=>['complaint','refund','visit'].includes(c.src)&&c.reportedAt>=from&&c.coachName).forEach(c=>{if(tasks.some(x=>x.caseId===c.id))return;add('complaint',c,{caseId:c.id,src:c.src,note:c.summary})})}
+  if(R_.complaint.on){const from=Date.now()-(+R_.complaint.window)*864e5;Store.all('complaints').filter(c=>!c.history&&!['closed','revoked'].includes(c.status)&&(c.reportedAt||0)>=from&&(c.coachId||c.coachName)).forEach(c=>{if(tasks.some(x=>x.cplId===c.id))return;add('complaint',c,{cplId:c.id,src:'complaint',note:'投诉：'+((c.types||[]).join('、')||c.probType||'')})})}
   if(R_.risk.on){const lim=addDays(dateStr,-(+R_.risk.interval));coachAgg().filter(a=>a.risk==='high'&&a.active&&a.id).forEach(a=>{const l=lastQc['id:'+a.id];if(l&&l>lim)return;add('risk',{coachId:a.id,coachName:a.name},{note:'风险高'+(a.refund&&a.refund.high?'，高退费（'+RCAT[a.refund.cat][0]+' '+a.refund.n+' 单）':'')+(a.red?'，红线 '+a.red+' 次':'')+(a.overTr?'，复检超期':'')})})}
   if(R_.newCoach.on){[...ROSTER.values()].filter(c=>isActive(c)&&isDate(c.joinDate)&&daysLeft(c.joinDate)>=-(+R_.newCoach.days)&&!lastQc['id:'+c.coachId]).sort((a,b)=>a.joinDate<b.joinDate?-1:1).forEach(c=>add('newCoach',{coachId:c.coachId,coachName:c.name},{note:'入职 '+c.joinDate}))}
   if(R_.random.on){const lim=addDays(dateStr,-(+R_.random.stale)),rnd=seeded(dateStr);const pool=[...ROSTER.values()].filter(c=>isActive(c)&&!(lastQc['id:'+c.coachId]>lim)).map(c=>({c,r:rnd()})).sort((a,b)=>a.r-b.r);let n=0;for(const {c} of pool){if(n>=+R_.random.perDay)break;const before=cands.length;add('random',{coachId:c.coachId,coachName:c.name},{note:lastQc['id:'+c.coachId]?'上次质检 '+lastQc['id:'+c.coachId]:'从未质检'});if(cands.length>before)n++}}
@@ -2473,6 +2812,7 @@ function allTickets(){
   Store.all('tasks').forEach(t=>{const st=t.status;out.push({id:t.id,src:'task',type:t.kind==='recheck'?'复检任务':'质检任务',tcls:t.kind==='recheck'?'c-violet':'c-ok',coachName:t.coachName,coachId:t.coachId,title:t.reasonText+(t.note?' · '+t.note:''),steps:t.kind==='recheck'?['派发','复检','结论']:['派发','质检','完成'],idx:st==='done'?4:2,stop:st==='cancelled',ownerId:t.assigneeId,ownerName:t.assigneeName||(t.assigneeId?'':'任务池'),due:t.due,open:taskOpen(t),overdue:taskOverdue(t),status:st==='done'?'已完成':st==='cancelled'?'已取消':taskOverdue(t)?'已逾期':'待质检',scls:st==='done'?'c-ok':st==='cancelled'?'c-mute':taskOverdue(t)?'c-bad':'c-info',at:t.createdAt,std:t.std})});
   Store.all('training').forEach(t=>{const s=trStatus(t);const idx=s==='escalate'?5:t.recheckQcId?6:t.passed==='通过'?4:t.trainDate?3:2;out.push({id:t.id,src:'tr',type:'培训跟进',tcls:'c-amber',coachName:t.coachName,coachId:t.coachId,title:SD(t.std).label+' · 必修 '+((t.required||[]).join(' ')||'无'),steps:['首检','培训','通关','复检','结案'],idx,stop:s==='escalate',ownerId:t.ownerId||t.createdBy||'',ownerName:t.ownerName||'',due:t.due,open:trOpen(t),overdue:trOverdue(t),status:TRS[s][0],scls:trOverdue(t)?'c-bad':TRS[s][1],at:t.createdAt})});
   Store.all('cases').forEach(c=>{const m={pending_verify:2,verifying:2,pending_verdict:3,pending_notice:4,notified:5,appealing:5,archived:6,closed:(c.events||[]).some(e=>/申诉成立/.test(e.text||''))?5:3};const h=SLA_H[c.status];const due=h?dstr(new Date(c.reportedAt+h*H)):'';out.push({id:c.id,src:'case',type:c.src==='qc'?'违纪工单':'反馈工单',tcls:c.src==='qc'?'c-bad':'c-info',coachName:c.coachName,coachId:c.coachId,title:c.summary,steps:['导入','核实','判定','通知','闭环'],idx:m[c.status],stop:c.status==='closed',ownerId:c.assigneeId,ownerName:c.assigneeName,due,open:isOpenCase(c),overdue:sla(c).cls==='over',status:ST[c.status].t,scls:sla(c).cls==='over'?'c-bad':ST[c.status].c,at:c.reportedAt})});
+  Store.all('complaints').filter(c=>!c.history).forEach(c=>{const idx={to_notify:2,notified:3,appeal:3,confirmed:5,revoked:5,closed:5}[c.status];const due=c.status==='to_notify'?dstr(new Date((c.createdAt||Date.now())+24*H)):c.status==='notified'&&c.notifiedAt?dstr(new Date(cplDue(c))):'';out.push({id:c.id,src:'cpl',type:'投诉处理',tcls:'c-bad',coachName:c.coachName,coachId:c.coachId,title:(cplShow(c).map(i=>i.type).join('、')||c.probType||'投诉')+' · '+(c.desc||'').slice(0,24),steps:['导入','发通知','教练回复','结论'],idx,stop:c.status==='closed'||c.status==='revoked',ownerId:c.createdBy||'',ownerName:'',due,open:CPL_OPEN.includes(c.status)||cplFbPending(c),overdue:cplOver(c)||(c.status==='to_notify'&&Date.now()>(c.createdAt||0)+24*H),status:cplOver(c)?'48h 已到·待确认':cplFbPending(c)?'待反馈提交人':CPL_ST[c.status].t,scls:cplOver(c)?'c-bad':CPL_ST[c.status].c,at:c.createdAt||0})});
   return out;
 }
 const isMine=t=>Store.mode==='local'?true:(ME.id&&t.ownerId===ME.id);
@@ -2480,7 +2820,7 @@ const myTickets=()=>Store.ready()?allTickets().filter(isMine):[];
 const stepCls=(t,i)=>{const all=t.idx>t.steps.length;return t.stop?(i<t.idx-1?'done':i===t.idx-1?'stop':''):(all||i<t.idx-1)?'done':i===t.idx-1?'cur':''};
 const stepLabel=t=>t.stop?'已终止':t.idx>t.steps.length?'已完成':t.steps[t.idx-1]||'';
 function progHtml(t){return '<div class="mini-prog">'+t.steps.map((s,i)=>'<i class="'+stepCls(t,i)+'"></i>').join('')+'<span>'+esc(stepLabel(t))+'</span></div>'}
-const openTicket=t=>t.src==='task'?'data-task="'+t.id+'"':t.src==='tr'?'data-tr="'+t.id+'"':'data-case="'+t.id+'"';
+const openTicket=t=>t.src==='task'?'data-task="'+t.id+'"':t.src==='tr'?'data-tr="'+t.id+'"':t.src==='cpl'?'data-cpl="'+t.id+'"':'data-case="'+t.id+'"';
 let tkTab='mine',tkF={type:'',state:'open',q:''};
 function renderTasks(){
   const el=$('#v-tasks');if(!Store.ready()){el.innerHTML=loadingHtml;return}
@@ -2494,7 +2834,7 @@ function renderTasks(){
   $('#tk-new').onclick=()=>openDrawer('newtask','x');
   if(tkTab==='settings')return renderDispatch();
   const base=tkTab==='mine'?mine:all;
-  const types=['质检任务','复检任务','培训跟进','违纪工单','反馈工单'];
+  const types=['质检任务','复检任务','培训跟进','投诉处理','违纪工单','反馈工单'];
   const states=[['open','进行中',t=>t.open],['overdue','已逾期',t=>t.overdue],['done','已完成',t=>!t.open],['all','全部',()=>true]];
   const q=tkF.q.trim().toLowerCase();
   const list=base.filter(t=>gfCoachOk(t.coachId,t.coachName)&&gfDateOk(t.due||t.runDate)).filter(t=>(!tkF.type||t.type===tkF.type)&&states.find(s=>s[0]===tkF.state)[2](t)&&(!q||(t.id+(t.coachName||'')+(t.coachId||'')+t.title).toLowerCase().includes(q))).sort((a,b)=>(b.overdue-a.overdue)||((a.due||'9')<(b.due||'9')?-1:(a.due||'9')>(b.due||'9')?1:0)||b.at-a.at);
@@ -2759,7 +3099,7 @@ function renderImport(force){
   box.dataset.flow='';
   const list=[...ROSTER.values()],act=list.filter(isActive);
   const by=k=>{const m={};act.forEach(c=>{const v=c[k]||'未填';m[v]=(m[v]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])};
-  const hist=Store.all('imports').filter(h=>h.kind!=='refund').sort((a,b)=>b.at-a.at).slice(0,10);
+  const hist=Store.all('imports').filter(h=>h.kind!=='refund'&&h.kind!=='complaint').sort((a,b)=>b.at-a.at).slice(0,10);
   box.innerHTML='<div class="stats"><div class="stat"><div class="num">'+list.length+'</div><div class="lab">名单总人数</div></div><div class="stat"><div class="num">'+act.length+'</div><div class="lab">在职</div></div><div class="stat"><div class="num">'+act.filter(isNewCoach).length+'</div><div class="lab">新教练（入职 90 天内）</div></div><div class="stat"><div class="num" style="font-size:16px;line-height:1.4">'+(ROSTER_META?fmtT(ROSTER_META.updatedAt):'—')+'</div><div class="lab">最近更新'+(ROSTER_META&&ROSTER_META.by?' · '+esc(who(ROSTER_META.by)):'')+'</div></div></div>'+
   (list.length?'<div class="grid-2"><div class="panel"><div class="p-label">在职 · 按教练标签</div><div class="bars">'+by('tag').map(([k,n])=>'<div class="bar-row"><span>'+esc(k)+'</span><div class="bar-track"><span style="width:'+(n/act.length*100)+'%"></span></div><span class="v">'+n+'</span></div>').join('')+'</div></div><div class="panel"><div class="p-label">在职 · 按教练等级</div><div class="bars">'+by('level').sort((a,b)=>lvIdx(a[0])-lvIdx(b[0])).slice(0,8).map(([k,n])=>'<div class="bar-row" style="grid-template-columns:110px minmax(0,1fr) 40px"><span>'+esc(k)+'</span><div class="bar-track"><span style="width:'+(n/act.length*100)+'%;background:var(--info)"></span></div><span class="v">'+n+'</span></div>').join('')+'</div></div></div>':'')+
   '<div class="panel"><div class="p-label">导入教练信息 <button class="btn sm" id="imp-tpl">下载导入模板</button></div>'+
