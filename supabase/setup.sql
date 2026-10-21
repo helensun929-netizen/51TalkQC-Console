@@ -39,7 +39,7 @@ create or replace function public.can_write(c text) returns boolean
 language sql stable security definer set search_path = public as $$
   select case public.my_role()
     when 'admin' then true
-    when 'qc'    then c not in ('roster','config','stdver','imports','refunds')
+    when 'qc'    then c not in ('roster','config','stdver','imports','refunds') and c not like 'ops\_%'
     else false
   end
 $$;
@@ -76,9 +76,13 @@ drop policy if exists members_admin_update on public.members;
 create policy members_admin_update on public.members for update to authenticated
   using (public.my_role() = 'admin') with check (public.my_role() = 'admin');
 
+-- 读取：管理员、只读看全部；质检专员看不到经营数据（分类以 ops_ 开头，例如 ops_orders 订单、ops_lessons 课时）
 drop policy if exists docs_select on public.docs;
 create policy docs_select on public.docs for select to authenticated
-  using (public.my_role() in ('admin','qc','viewer'));
+  using (
+    public.my_role() in ('admin','viewer')
+    or (public.my_role() = 'qc' and col not like 'ops\_%')
+  );
 
 drop policy if exists docs_insert on public.docs;
 create policy docs_insert on public.docs for insert to authenticated
